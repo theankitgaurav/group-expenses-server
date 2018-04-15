@@ -1,14 +1,19 @@
-require('dotenv').config()
+const env = require('dotenv').config()
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const app = express();
 
+
+// set secure HTTP headers
+app.use(helmet());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,6 +26,12 @@ app.use(express.static(path.join(__dirname, '../client', 'public')));
 
 // Required middlewares for Passportjs
 app.use(session({
+  store: new MongoDBStore(
+    {
+      uri: process.env.DB_URI,
+      databaseName: process.env.DB_DATABASE,
+      collection: 'mySessions'
+    }),
   secret: 'ankit secret',
   resave: true,
   saveUninitialized: true
@@ -29,7 +40,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-// Router assigned here
+// Routers assigned here
 const indexRouter = require('./routes/index');
 app.use('/', indexRouter);
 

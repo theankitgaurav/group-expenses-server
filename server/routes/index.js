@@ -59,7 +59,10 @@ router.post("/login",
 );
 
 router.get("/content", isLoggedIn, function (req, res) {
-  res.send("Congratulations! you've successfully logged in.");
+  res.render("home", {
+    title: 'Group Expenses | Home',
+    username: 'Ankit'
+  })
 });
 
 router.get("/logout", function (req, res) {
