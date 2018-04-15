@@ -1,51 +1,45 @@
 require('dotenv').config()
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const session = require('express-session');
+const app = express();
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../client', 'public')));
 
+// Required middlewares for Passportjs
+app.use(session({
+  secret: 'ankit secret',
+  resave: true,
+  saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// Router assigned here
+const indexRouter = require('./routes/index');
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
-mongoose.connect(
-  'mongodb://' 
-  + process.env.DB_USERNAME + ':' 
-  + process.env.DB_PASSWORD + '@' 
-  + process.env.DB_HOST + ':41489/' 
-  + process.env.DB_DATABASE
-);
+// setup db connection
+mongoose.connect(process.env.DB_URI);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log("DB connection OK.");
 });
-const User = mongoose.model('User', { name: String });
-
-// const user1 = new User({ name: 'Zildjian' });
-// user1.save().then(() => console.log(`${user1.name} saved into db.`));
-User.find((err, user)=>{
-  if (err) console.log(err);
-  console.log(user + '\n')
-})
-
-
 
 
 // catch 404 and forward to error handler
