@@ -25,7 +25,36 @@ passport.use('local-login', new LocalStrategy(
           "message": "User not found."
         });
       }
+      if(!user.isValidPassword(password)) {
+        console.log("Invalid password.")
+        return done(null, false, {
+          "message": "Invalid password."
+        })
+      }
       return done(null, user);
+    })
+  }));
+
+// passport local strategy for local-signup, local refers to this app
+passport.use('local-signup', new LocalStrategy(
+  function (username, password, done) {
+    User.findOne({
+      username: username
+    }, (err, user) => {
+      if(err) {
+        return done(null, false);
+      }
+      if(user) {
+        console.log(`user found ${user}`);
+        return done(null, user);
+      }
+      const newUser = new User();
+      newUser.username = username;
+      newUser.password = password;
+      newUser.save(function(err) {
+        if (err) throw err;
+        return done(null, newUser);
+      });
     })
   }));
 
@@ -49,7 +78,9 @@ router.get("/login", function (req, res, next) {
   if (req.isAuthenticated()) return res.redirect('/content');
   return next();
 }, function (req, res) {
-  res.send("<p>Please login!</p><form method='post' action='/login'><input type='text' name='username'/><input type='password' name='password'/><button type='submit' value='submit'>Submit</buttom></form>");
+  res.render("login", {
+    title: "Group Expenses | Login"
+  });
 });
 router.post("/login",
   passport.authenticate("local-login", {
@@ -58,10 +89,22 @@ router.post("/login",
   })
 );
 
+router.get('/register', function(req, res, next) {
+  res.render("register", {
+    title: "Group Expenses | Register"
+  });
+});
+
+router.post("/register", passport.authenticate("local-signup", {
+  successRedirect: "/content",
+  failureRedirect: "/signup"
+})
+)
+
 router.get("/content", isLoggedIn, function (req, res) {
   res.render("home", {
     title: 'Group Expenses | Home',
-    username: 'Ankit'
+    username: 'User'
   })
 });
 
