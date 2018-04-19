@@ -42,7 +42,9 @@ app.use(passport.session());
 
 // Routers assigned here
 const indexRouter = require('./routes/index');
+const apisRouter = require('./routes/apis');
 app.use('/', indexRouter);
+app.use('/api/', apisRouter);
 
 // setup db connection
 mongoose.connect(process.env.DB_URI);
@@ -55,7 +57,7 @@ db.once('open', function() {
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  next(createError(404, 'The resource you are looking for does not exist'));
 });
 
 // error handler
