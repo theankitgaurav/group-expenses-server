@@ -42,7 +42,9 @@ app.use(passport.session());
 
 // Routers assigned here
 const indexRouter = require('./routes/index');
+const apiRouter = require("./routes/apis");
 app.use('/', indexRouter);
+app.use("/api/", apiRouter);
 
 // setup db connection
 mongoose.connect(process.env.DB_URI);
