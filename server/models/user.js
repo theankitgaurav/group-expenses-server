@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const passwordHash = require('password-hash');
+const bcrypt = require('bcrypt');
+
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -16,13 +18,22 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.pre('save', function(next) {
     const user = this;
-    user.password = passwordHash.generate(user.password);
-    next();
+    bcrypt.hash(user.password, saltRounds=10, function(err, hash) {
+        if(err) {
+            throw new Error('Password hashing failed.');
+        } else {
+            user.password = hash;
+            next();
+        }
+      });
 })
 
 // checking if password is valid
 UserSchema.methods.isValidPassword = function(password) {
-    return (passwordHash.verify(password, this.password));
+    bcrypt.compare(password, this.password, function(err, res) {
+        if(err) throw new Error('Password comparison failed.')
+        return res;
+    });
 };
 
 module.exports = mongoose.model('UserModel', UserSchema);
