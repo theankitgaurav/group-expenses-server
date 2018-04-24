@@ -25,14 +25,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../client', 'public')));
 
 // setup db connection
-let db_uri, db_name;
-if(app.get('env') == 'development') {
-  db_uri = 'mongodb://localhost:27017/Group-Expenses-Dev';
-  db_name = 'Group-Expenses-Dev';
-} else {
-  db_uri = process.env.DB_URI;
-  db_name = process.env.DB_DATABASE;
-}
+let db_uri = process.env.DB_URI;
+let db_name = process.env.DB_DATABASE;
+// if(app.get('env') == 'development') {
+//   db_uri = 'mongodb://localhost:27017/Group-Expenses-Dev';
+//   db_name = 'Group-Expenses-Dev';
+// }
 mongoose.connect(db_uri);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
