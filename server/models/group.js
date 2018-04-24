@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const _ = require('lodash');
+const Entry = require('./entry');
+const User = require('./user');
 
 const GroupSchema = new mongoose.Schema({
     name: {
@@ -12,7 +14,8 @@ const GroupSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    members: [mongoose.Schema.Types.ObjectId]
+    entries: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Entry' }],
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 // Add a user to a group
