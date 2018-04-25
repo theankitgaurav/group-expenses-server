@@ -27,13 +27,18 @@ passport.use('local-login', new LocalStrategy(
         });
       }
       if(!user) return done(null, false, {"message": "User does not exist."})
-      if(!user.isValidPassword(password)) {
-        console.log("Invalid password.");
-        return done(null, false, {
-          "message": "Invalid password."
-        })
-      }
-      return done(null, user);
+
+      user.isValidPassword(password, function(err, isMatch) {
+        if (err) {
+          throw err;
+          return done(null, false, {"message":'Password comparison failed'});
+        }
+        if (!isMatch) {
+          console.log("Invalid password.");
+          return done(null, false, {"message": "Invalid password."})
+        }
+        return done(null, user);
+      });
     })
   }));
 
@@ -47,8 +52,8 @@ passport.use('local-signup', new LocalStrategy(
         return done(null, false);
       }
       if(user) {
-        console.log(`user found ${user}`);
-        return done(null, user);
+        console.log(`User already exists.`);
+        return done(null, false,  {"message": "User already exists."});
       }
       const newUser = new User({username,password});
       newUser.save(function(err) {

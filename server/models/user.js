@@ -31,13 +31,12 @@ UserSchema.pre('save', function(next) {
 })
 
 // checking if password is valid
-UserSchema.methods.isValidPassword = function(password) {
+UserSchema.methods.isValidPassword = function(password, cb) {
     const user = this;
-    return matchPassword(password, user.password);
+    bcrypt.compare(password, user.password, function(err, res) {
+        if (err) return cb(err);
+        return cb(null, res);
+    });
 };
-
-async function matchPassword(plainTextPassword, hash) {
-    return await bcrypt.compare(plainTextPassword, hash);
-}
 
 module.exports = mongoose.model('UserModel', UserSchema);
