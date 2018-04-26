@@ -55,24 +55,13 @@ passport.use('local-signup', new LocalStrategy(
         console.log(`User already exists.`);
         return done(null, false,  {"message": "User already exists."});
       }
-      const newUser = new User({username,password});
-      newUser.save(function(err) {
-        if (err) {
-          console.log(err.message);
-          return done(null, false, {"message": "Data reject in DB"});
+      User.create({username, password}, function(err, newUser){
+        if(err) {
+          console.log(err);
+          return done(null, false, {"message": "User could not be saved into db"});
         }
-        const group = new Group({
-          name: 'G' + (newUser._id),
-          members: [newUser._id]
-        });
-        group.save(function(err) {
-          if(err) {
-            console.log(err.message);
-            return done(null, false, {"message": "New user could not register into group"});
-          }
-          return done(null, newUser);
-        })
-      });
+        return done(null, newUser);
+      })
     })
   }));
 

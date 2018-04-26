@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const Group = require('./group');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -20,12 +21,24 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.pre('save', function(next) {
     const user = this;
+    // Hash the password before saving into db
     bcrypt.hash(user.password, saltRounds=10, function(err, hash) {
         if(err) {
             throw new Error('Password hashing failed.');
         } else {
             user.password = hash;
-            next();
+
+            // Create personal group for user
+            Group.create({
+                name: 'Personal',
+                members: user._id
+            }, function(err, personalGroup) {
+                if(err) {
+                    throw new Error(`Default personal group couldn't be created for user ${user.name}`);
+                }
+                console.log(`Default personal group ${personalGroup._id} created for user `)
+                next();
+            })
         }
       });
 })

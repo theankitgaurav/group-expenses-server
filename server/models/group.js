@@ -22,7 +22,7 @@ const GroupSchema = new mongoose.Schema({
 GroupSchema.methods.addUser = function(userId) {
     if(this.members.indexOf(userId) == -1) {
         this.members.push(userId);
-        console.log(`User id: ${userId} add as a member of group: ${this.name}`);
+        console.log(`User id: ${userId} added as a member of group: ${this.name}`);
     }
     console.log(`User id: ${userId} already exists as a member of group: ${this.name}`);
 };
