@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema({
         required: true,
         minlength: 6
     }
-});
+}, { timestamps: { createdAt: 'createdAt', updatedAt: "updatedAt" } });
 
 UserSchema.pre('save', function(next) {
     const user = this;

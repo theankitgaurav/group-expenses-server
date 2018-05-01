@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const EntrySchema = new mongoose.Schema({
     amount: { type: Number, required: true },
-    category: String,
     details: { type: String, trim: true },
     enteredBy: {
         type: mongoose.Schema.Types.ObjectId,

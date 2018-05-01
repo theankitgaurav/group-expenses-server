@@ -5,6 +5,7 @@ const _ = require('lodash');
 
 let items = require('../mocks/items');
 let users = require('../mocks/users');
+const Entry = requires('../models/entry');
 
 // Middleware to dd the item to request object if itemId matches
 router.param("id", (req, res, next)=>{
