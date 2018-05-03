@@ -64,7 +64,7 @@ router.post("*/items", (req, res, next)=>{
             {$push: {entries:entryInDb._id}}, 
             {new: true}, 
             function(err, groupInDb) {
-                if(err) return handleError(`Entrylist could not be updated after a new entry was created.`, err, next);
+                if(err) return next(err);
                 console.log(`New entry saved and group entryList updated successfully.`);
                 return res.status(200).json(entryInDb._id);
         });
