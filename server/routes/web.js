@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {passport, isLoggedIn} = require('./../middlewares/passport-local');
+const {passport, isLoggedIn} = require('./../auth/passport-local');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  if (req.isAuthenticated()) return res.redirect('home');
+  if (req.isAuthenticated()) return res.redirect('/ home');
   return next();
 }, function (req, res, next) {
   res.render('index', {
@@ -14,48 +14,36 @@ router.get('/', function (req, res, next) {
 
 // api endpoints for login, content and logout
 router.get("/login", function (req, res, next) {
-  if (req.isAuthenticated()) return res.redirect('home');
+  if (req.isAuthenticated()) return res.status(200).json({"message": "Login Success.", "data": req.user});
   return next();
 }, function (req, res) {
-  res.render("login", {
-    title: "Group Expenses | Login"
-  });
+  return res.status(301).json({"message": "Login Required", "data": null});
 });
 
 router.post("/login",
   passport.authenticate("local-login", {
-    successRedirect: 'home',
+    successRedirect: '/home',
     failureRedirect: "/login"
   })
 );
 
 router.get('/register', function(req, res, next) {
-  res.render("register", {
-    title: "Group Expenses | Register"
-  });
+  return res.status(301).json("User registration required.");
 });
 
 router.post("/register", passport.authenticate("local-signup", {
-  successRedirect: "home",
+  successRedirect: "/home",
   failureRedirect: "/register"
 })
 )
 
 router.get("/home", isLoggedIn, function (req, res) {
-  res.render("home", {
-    title: 'Group Expenses | Home',
-    username: 'User'
-  })
+  return res.status(200).json({"message": "Login Success.", "data": req.user});
 });
 
 router.get("/logout", function (req, res) {
   req.logout();
-  res.send(`
-  <html>
-    <p>You have been logged out successfully.</p>
-    <a href="/">Go home</a>
-  </html>
-  `);
+  return res.send(200).send("Logout success");
 });
 
 module.exports = router;
