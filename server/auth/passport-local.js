@@ -22,15 +22,13 @@ passport.use('local-login', new LocalStrategy(
       username: username
     }, (err, user) => {
       if (err) {
-        return done(null, false, {
-          "message": "User not found."
-        });
+        return done(err);
       }
       if(!user) return done(null, false, {"message": "User does not exist."})
 
       user.isValidPassword(password, function(err, isMatch) {
         if (err) {
-          throw err;
+          console.error(`Password comparison failed`, err);
           return done(null, false, {"message":'Password comparison failed'});
         }
         if (!isMatch) {
@@ -49,7 +47,7 @@ passport.use('local-signup', new LocalStrategy(
       username: username
     }, (err, user) => {
       if(err) {
-        return done(null, false);
+        return done(err);
       }
       if(user) {
         console.log(`User already exists.`);
@@ -67,8 +65,9 @@ passport.use('local-signup', new LocalStrategy(
 
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {
-  if (req.isAuthenticated())
+  if (req.isAuthenticated()) {
     return next();
+  }
   res.redirect('/');
 }
 
