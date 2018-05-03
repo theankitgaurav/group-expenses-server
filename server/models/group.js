@@ -14,8 +14,8 @@ const GroupSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    entries: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Entry' }],
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    entries: [{ type: mongoose.Schema.Types.ObjectId, ref: 'EntryModel' }],
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserModel' }]
 }, { timestamps: { createdAt: 'createdAt', updatedAt: "updatedAt" } });
 
 // Add a user to a group
