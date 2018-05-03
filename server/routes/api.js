@@ -1,4 +1,5 @@
 const express = require("express");
+const createError = require('http-errors');
 const router = express.Router();
 const {isLoggedIn} = require('./../auth/passport-local');
 const _ = require('lodash');
@@ -17,7 +18,7 @@ router.use('/group/:groupId/*', (req, res, next) => {
     .populate({'path': 'entries', 'select': ['_id', 'category', 'forUser', 'amount', 'forDate']})
     .exec(function(err, groupInDb){
         if(err) return next(err);
-        if(groupInDb == null) return res.status(400).json({'message': `Group doesn't exist`, 'data': null});
+        if(groupInDb == null) return next(createError(404, `Group doesn't exist`));
         req.group = groupInDb;
         return next();
     });
@@ -32,7 +33,7 @@ router.param("itemId", (req, res, next)=>{
     .populate({'path':'updatedBy', 'select': ['_id', 'username']})
     .exec(function(err, entryInDb){
         if (err) return next(err);
-        if(entryInDb == null) return res.status(400).json({"message": "Entry does not exist in db", "data": null});
+        if(entryInDb == null) return next(createError(404, 'Entry does not exist in db'));
         req.item = entryInDb;
         return next();
     });
