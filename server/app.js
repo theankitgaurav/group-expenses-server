@@ -5,13 +5,15 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const helmet = require('helmet');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const app = express();
 
-
+// Allow the app to use CORS
+app.use(cors())
 // set secure HTTP headers
 app.use(helmet());
 
@@ -57,7 +59,7 @@ app.use(passport.session());
 const webRouter = require('./routes/web');
 const apiRouter = require('./routes/api');
 app.use('/', webRouter);
-app.use('/api/', apiRouter);
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -66,6 +68,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+  console.error(err.message);
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
