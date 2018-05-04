@@ -43,7 +43,7 @@ router.get("/home", isLoggedIn, function (req, res) {
 
 router.get("/logout", function (req, res) {
   req.logout();
-  return res.send(200).send("Logout success");
+  return res.status(200).send("Logout success");
 });
 
 module.exports = router;

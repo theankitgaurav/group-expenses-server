@@ -19,6 +19,7 @@ router.use('/group/:groupId/*', (req, res, next) => {
     .exec(function(err, groupInDb){
         if(err) return next(err);
         if(groupInDb == null) return next(createError(404, `Group doesn't exist`));
+        if(groupInDb.members.indexOf(req.user._id) == -1) return next(createError(403, `Current user not a member of specified group.`));
         req.group = groupInDb;
         return next();
     });
@@ -74,6 +75,10 @@ router.post("*/items", (req, res, next)=>{
 
 // Update an existing Entry from a Group
 router.put("*/items/:itemId", (req, res, next)=>{
+    // Check if Entry update should be allowed
+    if(req.item.enteredBy._id != req.user._id){
+        return next(createError(403, `Entry created by one user can't be modified by another.`));
+    }
     const editedEntryObj = getEntryObject(req);
     EntryModel.findOneAndUpdate(
         {_id: req.item._id},
@@ -89,6 +94,10 @@ router.put("*/items/:itemId", (req, res, next)=>{
 
 // Delete an Entry from a Group
 router.delete("*/items/:itemId", (req, res)=>{
+    // Check if deletion of Entry should be allowed
+    if(req.item.enteredBy._id != req.user._id){
+        return next(createError(403, `Entry created by other user can't be deleted.`));
+    }
     EntryModel.findOneAndRemove({_id: req.params.itemId}, function(err, entryInDb){
         if(err) return next(err);
         console.log(`Item deletion successful.`);
@@ -106,9 +115,9 @@ function getEntryObject(requestObject) {
     const entryObject = {
         amount: requestObject.body.amount || '',
         category: requestObject.body.category || '',
-        enteredBy: requestObject.user._id,
-        forUser: requestObject.user._id,
-        updatedBy: requestObject.user._id
+        enteredBy: requestObject.body.enteredBy || requestObject.user._id,
+        forUser: requestObject.body.forUser || requestObject.user._id,
+        updatedBy: requestObject.body.updatedBy || requestObject.user._id
     };
     console.log(JSON.stringify(entryObject));
     return entryObject;
