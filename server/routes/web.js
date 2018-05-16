@@ -1,15 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const createError = require('http-errors');
 const {passport, isLoggedIn} = require('./../auth/passport-local');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  if (req.isAuthenticated()) return res.redirect('/ home');
-  return next();
-}, function (req, res, next) {
-  res.render('index', {
-    title: 'Group Expenses'
-  });
+  res.json({'message': 'Hi stranger.'})
 });
 
 // api endpoints for login, content and logout
@@ -37,7 +33,10 @@ router.post("/register", passport.authenticate("local-signup", {
 })
 )
 
-router.get("/home", isLoggedIn, function (req, res) {
+router.get("/home", function(req, res, next) {
+    if (req.isAuthenticated) return next();
+    return next(createError(401, "You need to be logged in first."));
+  }, function (req, res) {
   return res.status(200).json({"message": "Login Success.", "data": req.user});
 });
 

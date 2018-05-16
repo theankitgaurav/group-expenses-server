@@ -52,4 +52,11 @@ UserSchema.methods.isValidPassword = function(password, cb) {
     });
 };
 
+// check password using async await
+UserSchema.methods.isValidPasswordAsync = async function(password) {
+    const user = this;
+    const match = await bcrypt.compare(password, user.password);
+    return match;
+}
+
 module.exports = mongoose.model('UserModel', UserSchema);
