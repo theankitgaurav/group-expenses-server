@@ -1,4 +1,4 @@
-const env = require('dotenv').config()
+const env = require('dotenv').config();
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -75,7 +75,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json(err.message || 'Internal error.');
 });
 
 module.exports = app;
