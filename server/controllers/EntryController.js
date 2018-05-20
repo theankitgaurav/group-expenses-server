@@ -35,7 +35,12 @@ module.exports = {
         return res.status(200).json(req.item);
     },
     async postEntry (req, res, next) {
-        let entryObj = prepareEntryObject(req);
+        let entryObj;
+        try {
+            entryObj = prepareEntryObject(req);
+        } catch (err) {
+            return next(createError(400, "Invalid data sent for new post."));
+        }
         EntryModel.create(entryObj, function (err, entryInDb) {
             if(err) return next(err);
             GroupModel.findOneAndUpdate(
@@ -43,7 +48,7 @@ module.exports = {
                 {$push: {entries:entryInDb._id}}, 
                 {new: true}, 
                 function(err, groupInDb) {
-                    if(err) return next(err);
+                    if(err) return next(createError(500, err));
                     console.log(`New entry saved and group entryList updated successfully.`);
                     return res.status(200).json(entryInDb._id);
             });

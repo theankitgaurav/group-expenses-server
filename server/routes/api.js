@@ -19,7 +19,7 @@ router.use('/group/:groupId/*', (req, res, next) => {
     .findOne({_id: req.params.groupId})
     .populate({'path': 'entries', 'select': ['_id', 'category', 'forUser', 'amount', 'forDate']})
     .exec(function(err, groupInDb){
-        if(err) return next(err);
+        if(err) return next(createError(500, err));
         if(groupInDb == null) return next(createError(404, `Group doesn't exist`));
         // if(groupInDb.members.indexOf(req.user._id) == -1) return next(createError(403, `Current user not a member of specified group.`));
         req.group = groupInDb;
