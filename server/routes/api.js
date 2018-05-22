@@ -42,11 +42,11 @@ router.param("itemId", (req, res, next)=>{
     });
 });
 
-router.get("/group/:groupId/items", EntryController.getEntries);
-router.get("/group/:groupId/items/:itemId", EntryController.getEntryById);
-router.post("/group/:groupId/items", EntryController.postEntry);
-router.put("/group/:groupId/items/:itemId", EntryController.updateEntry);
-router.delete("/group/:groupId/items/:itemId", EntryController.deleteEntryById);
+router.get("/group/:groupId/items", AuthController.isAuthenticated, EntryController.getEntries);
+router.get("/group/:groupId/items/:itemId", AuthController.isAuthenticated, EntryController.getEntryById);
+router.post("/group/:groupId/items", AuthController.isAuthenticated, EntryController.postEntry);
+router.put("/group/:groupId/items/:itemId", AuthController.isAuthenticated, EntryController.updateEntry);
+router.delete("/group/:groupId/items/:itemId", AuthController.isAuthenticated, EntryController.deleteEntryById);
 
 router.post("/signup", AuthController.register);
 router.post("/signin", AuthController.login);
