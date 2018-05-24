@@ -35,24 +35,23 @@ module.exports = {
         return res.status(200).json(req.item);
     },
     async postEntry (req, res, next) {
-        let entryObj;
         try {
-            entryObj = prepareEntryObject(req);
+            const entryObj = prepareEntryObject(req);
+            EntryModel.create(entryObj, function (err, entryInDb) {
+                if(err) return next(err);
+                GroupModel.findOneAndUpdate(
+                    {_id: req.group._id}, 
+                    {$push: {entries:entryInDb._id}}, 
+                    {new: true}, 
+                    function(err, groupInDb) {
+                        if(err) return next(createError(500, err));
+                        console.log(`New entry saved and group entryList updated successfully.`);
+                        return res.status(200).json(entryInDb._id);
+                });
+            });
         } catch (err) {
             return next(createError(400, "Invalid data sent for new post."));
         }
-        EntryModel.create(entryObj, function (err, entryInDb) {
-            if(err) return next(err);
-            GroupModel.findOneAndUpdate(
-                {_id: req.group._id}, 
-                {$push: {entries:entryInDb._id}}, 
-                {new: true}, 
-                function(err, groupInDb) {
-                    if(err) return next(createError(500, err));
-                    console.log(`New entry saved and group entryList updated successfully.`);
-                    return res.status(200).json(entryInDb._id);
-            });
-        });
     },
     async updateEntry (req, res, next){
         // Check if Entry update should be allowed

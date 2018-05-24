@@ -2,6 +2,13 @@ const createError = require('http-errors');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
+/**
+ * Asynchronous method to generate a jwt based on the default algorithm HS256
+ * The secret key is fetched from environment variable
+ * TODO: Change the secret key in production before release
+ * @param {any} payload 
+ * @returns the generated jwt or Error (eg: TokenExpiredError, JsonWebTokenError)
+ */
 async function jwtSign(payload) {
     try {
         const token = await jwt.sign({data: payload}, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -9,7 +16,7 @@ async function jwtSign(payload) {
         return token;
     } catch (err) {
         console.log(`Error during token generation.`);
-        return err;
+        throw err;
     } 
 }
 
