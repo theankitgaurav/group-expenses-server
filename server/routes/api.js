@@ -1,7 +1,6 @@
 const express = require("express");
 const createError = require('http-errors');
 const router = express.Router();
-const {isLoggedIn} = require('./../auth/passport-local');
 const _ = require('lodash');
 const EntryController = require('../controllers/EntryController');
 const AuthController = require('../controllers/AuthController');
