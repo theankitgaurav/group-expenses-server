@@ -15,7 +15,7 @@ async function jwtSign(payload) {
         console.log(`Token generated sucessfully.`);
         return token;
     } catch (err) {
-        console.log(`Error during token generation.`);
+        console.error(`Error during token generation.`);
         throw err;
     } 
 }
@@ -27,7 +27,7 @@ module.exports = {
             const user = await User.create({username, password});
             return res.status(200).send(user.toJSON());
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return res.status(400).send({
                 error: 'This username is already in use.'
             });
@@ -66,7 +66,7 @@ module.exports = {
             console.log(`JWT verified.`);
             return next();
         } catch (err) {
-            console.log(`Error while verify jwt`, err);
+            console.error(`Error while verify jwt`, err);
             return next(createError(401, `Invalid credentials.`));
         }
     }

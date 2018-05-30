@@ -9,6 +9,7 @@
     "bcrypt": "^2.0.1",
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "^3.5.1",
+    "chalk": "^2.4.1",
     "compression": "^1.7.2",
     "connect-mongodb-session": "^2.0.2",
     "cookie-parser": "~1.4.3",
