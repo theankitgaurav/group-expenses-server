@@ -2,14 +2,10 @@ const env = require('dotenv').config();
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const passport = require('passport');
-const session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
 const app = express();
 
 // Allow the app to use CORS
@@ -18,13 +14,9 @@ app.use(cors())
 app.use(helmet());
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../client', 'public')));
 
 // setup db connection
 let db_uri = process.env.DB_URI;
@@ -40,25 +32,9 @@ db.once('open', function() {
   console.log("DB connection OK.");
 });
 
-// Required middlewares for Passportjs
-app.use(session({
-  store: new MongoDBStore(
-    {
-      uri: db_uri,
-      databaseName: db_name,
-      collection: 'mySessions'
-    }),
-  secret: 'ankit secret',
-  resave: true,
-  saveUninitialized: true
-}));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Routers assigned here
-const webRouter = require('./routes/web');
 const apiRouter = require('./routes/api');
-app.use('/', webRouter);
 app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
