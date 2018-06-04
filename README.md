@@ -19,3 +19,34 @@ A simple web app to manage expenses
 + Spent On (Date when the expense happened)
 + Remarks (Optional)
 + Divide Among (The list of members among whom the amount needs to be divided)
+
+
+## DB Models Outline
+
+# User
+- id (pk)
+- name
+- email
+- password
+- status
+
+# Group
+- id (pk)
+- name
+- url
+- status
+
+# UserGroupMap
+- id (pk)
+- user (fk User.id)
+- group (fk Group.id)
+
+# Expense
+- id (pk)
+- category
+- amount
+- date
+- payer (fk User.id)
+- details
+- group (fk Group.id)
+- status
