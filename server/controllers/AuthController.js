@@ -2,14 +2,21 @@ const createError = require('http-errors');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
+/**
+ * Asynchronous method to generate a jwt based on the default algorithm HS256
+ * The secret key is fetched from environment variable
+ * TODO: Change the secret key in production before release
+ * @param {any} payload 
+ * @returns the generated jwt or Error (eg: TokenExpiredError, JsonWebTokenError)
+ */
 async function jwtSign(payload) {
     try {
         const token = await jwt.sign({data: payload}, process.env.JWT_SECRET, { expiresIn: '1h' });
         console.log(`Token generated sucessfully.`);
         return token;
     } catch (err) {
-        console.log(`Error during token generation.`);
-        return err;
+        console.error(`Error during token generation.`);
+        throw err;
     } 
 }
 
@@ -20,7 +27,7 @@ module.exports = {
             const user = await User.create({username, password});
             return res.status(200).send(user.toJSON());
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return res.status(400).send({
                 error: 'This username is already in use.'
             });
@@ -59,7 +66,7 @@ module.exports = {
             console.log(`JWT verified.`);
             return next();
         } catch (err) {
-            console.log(`Error while verify jwt`, err);
+            console.error(`Error while verify jwt`, err);
             return next(createError(401, `Invalid credentials.`));
         }
     }

@@ -28,17 +28,19 @@ UserSchema.pre('save', function(next) {
         } else {
             user.password = hash;
 
+            // FIXME: Group creation is not working properly, so commented out temporarily
             // Create personal group for user
-            Group.create({
-                name: 'Personal',
-                members: user._id
-            }, function(err, personalGroup) {
-                if(err) {
-                    throw new Error(`Default personal group couldn't be created for user ${user.name}`);
-                }
-                console.log(`Default personal group ${personalGroup._id} created for user `)
-                next();
-            })
+            // Group.create({
+            //     name: 'Personal',
+            //     members: user._id
+            // }, function(err, personalGroup) {
+            //     if(err) {
+            //         throw new Error(`Default personal group couldn't be created for user ${user.name}`);
+            //     }
+            //     console.log(`Default personal group ${personalGroup._id} created for user `)
+            //     next();
+            // })
+            next();           
         }
       });
 })
