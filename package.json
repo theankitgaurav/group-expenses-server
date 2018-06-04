@@ -32,6 +32,9 @@
     "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
     "password-hash": "^1.2.2",
+    "pg": "^7.4.3",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.37.10",
     "winston": "^3.0.0-rc4"
   }
 }

@@ -34,8 +34,10 @@ db.once('open', function() {
 
 
 // Routers assigned here
-const apiRouter = require('./routes/api');
-app.use('/api', apiRouter);
+// const apiRouter = require('./routes/api');
+// app.use('/api', apiRouter);
+const apiRouter = require('./routes/v2/api');
+app.use('/', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
