@@ -50,3 +50,9 @@ A simple web app to manage expenses
 - details
 - group (fk Group.id)
 - status
+
+# Category
+- id (pk)
+- name
+- group (fk Group.id)
+- status
