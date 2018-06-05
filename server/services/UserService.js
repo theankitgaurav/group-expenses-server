@@ -23,18 +23,20 @@ module.exports = {
 
         return User.create(userObj, {transaction: t})
         .then(function (user) {
-          return Group.create({ name: 'Personal' }, {transaction: t})
+          console.log('User created with id: ' + user.id);
+          return Group.create({ name: 'Personal', ownerID: user.id}, {transaction: t})
           .then((group)=>{
-            console.log('user: ', user);
-            console.log('group: ', group);
+            console.log('Deafult group created with id: ' + group.id);
             user.addGroup(group, { through: { owner: user.id }})
             return user;
           });
         });
       
-      }).then(function (result) { // Transaction has been committed
+      }).then(function (result) { 
+        console.log('Transaction has been committed for user registration flow.');
         resolve(result);
-      }).catch(function (err) { // Transaction has been rolled back
+      }).catch(function (err) {
+        console.log("Transaction has been rolled back for user registration flow.");
         console.error(err);
         reject(new Error("User could not be saved into db", err));
       });

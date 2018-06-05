@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     status: {type: DataTypes.STRING, defaultValue: 'active'}
   }, {});
   User.associate = function (models) {
-    User.belongsToMany(models.Group, {through: 'UserVsGroup'});
+    User.belongsToMany(models.Group, {through: 'UserVsGroup', foreignKey: "userId", otherKey: "groupId"});
   };
   // Hash password before saving user into db
   User.beforeCreate((user, options) => {
