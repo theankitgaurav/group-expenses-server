@@ -1,6 +1,6 @@
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
-const User = require('../../db/models').User;
+const UserService = require('../../services/UserService');
 const Group = require('../../db/models').Group;
 
 /**
@@ -35,23 +35,16 @@ function createDefaultGroup (newUser) {
 module.exports = {
     async register(req, res, next) {
         const {name, email, password} = req.body;
-        User.create({name, email, password})
-        .then((user)=>{
-            // createDefaultGroup(user);
-            return res.status(200).send({
-                error: null,
-                msg: "User created successfully",
-                data: user.toJSON()
+        try {
+            const result = await UserService.registerUser({name, email, password});
+            return res.status(200).json({
+                "message": "User registration success.",
+                "data": result.toJSON()
             });
-        })
-        .catch((err)=>{
-            console.error(err);
-            return res.status(400).send({
-                error: 'This email is already in use.',
-                msg: null,
-                data: null
-            });
-        });
+        } catch (err) {
+            console.log(err);
+            return next(createError(400, err.message));
+        }
     },
     async login(req, res, next) {
         res.send('User logged in.');

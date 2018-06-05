@@ -39,6 +39,7 @@ db.once('open', function() {
 const apiRouter = require('./routes/v2/api');
 app.use('/', apiRouter);
 
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404, 'The resource you are looking for does not exist'));
@@ -46,7 +47,6 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  console.error(new Error(err));
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

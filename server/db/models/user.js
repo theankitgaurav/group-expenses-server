@@ -1,15 +1,5 @@
 'use strict';
-const bcrypt = require('bcrypt');
-
-
-function hashPassword(plainTextPassword) {
-  return new Promise(function (resolve, reject) {
-    const saltRounds = 10;
-    bcrypt.hash(plainTextPassword, saltRounds)
-      .then(function (hash) { resolve(hash); })
-      .catch((err)=>{ reject(err); });
-  })
-}
+const hashPassword = require('../../utils/utils').hashPassword;
 
 module.exports = (sequelize, DataTypes) => {
   var User = sequelize.define('User', {
@@ -19,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     status: {type: DataTypes.STRING, defaultValue: 'active'}
   }, {});
   User.associate = function (models) {
-    // associations can be defined here
+    User.belongsToMany(models.Group, {through: 'UserVsGroup'});
   };
   // Hash password before saving user into db
   User.beforeCreate((user, options) => {
