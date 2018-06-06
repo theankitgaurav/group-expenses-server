@@ -46,5 +46,8 @@ module.exports = {
    */
   isValidPassword: async function (plainTextPassword, hashToMatchWith) {
     return await bcrypt.compare(plainTextPassword, hashToMatchWith);
-  }
+  },
+  jwtVerify: async function () {
+    return jwt.verify(tokenFromUser , process.env.JWT_SECRET);
+  } 
 }

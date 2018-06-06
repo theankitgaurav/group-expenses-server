@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const utils = require('../../utils/utils');
 const UserService = require('../../services/UserService');
 
 module.exports = {
@@ -27,5 +28,20 @@ module.exports = {
             console.log(err);
             return next(err);
         }
+    },
+    async isAuthenticated (req, res, next) {
+        const tokenFromUser = req.headers['x-access-token'];
+        if (tokenFromUser == null || tokenFromUser == undefined){
+            return next(createError(401, `Missing token.`));
+        }
+        utils.jwtVerify(tokenFromUser , process.env.JWT_SECRET)
+        .then((res)=>{
+            console.log(`JWT verified.`);
+            return next();
+        })
+        .catch((err)=>{
+            console.error(`Error while verifying jwt`, err);
+            return next(createError(401, `Bad token.`));
+        })
     }
 }
