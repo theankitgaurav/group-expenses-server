@@ -24,11 +24,11 @@ module.exports = {
         return User.create(userObj, {transaction: t})
         .then(function (user) {
           console.log('User created with id: ' + user.id);
-          return Group.create({ name: 'Personal', ownerID: user.id}, {transaction: t})
+          return Group.create({ name: 'Personal', ownerId: user.id}, {transaction: t})
           .then((group)=>{
             console.log('Deafult group created with id: ' + group.id);
-            user.addGroup(group, { through: { owner: user.id }})
-            return user;
+            user.addGroup(group).then(res=>console.log('User-vs-Group relation added to map.'));
+            return user.id;
           });
         });
       
