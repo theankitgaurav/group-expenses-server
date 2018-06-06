@@ -1,39 +1,8 @@
 const createError = require('http-errors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const utils = require('../utils/utils');
 const db = require('../db/models/index');
 const User = require('../db/models').User;
 const Group = require('../db/models').Group;
-
-
-/**
- * Asynchronous method to generate a jwt based on the default algorithm HS256
- * The secret key is fetched from environment variable
- * @param {any} payload 
- * @returns {Prommise} Generated jwt or Error (eg: TokenExpiredError, JsonWebTokenError)
- */
-async function jwtSign(payload) {
-  try {
-      const token = await jwt.sign({data: payload}, process.env.JWT_SECRET, { expiresIn: '1h' });
-      console.log(`Token generated sucessfully.`);
-      return token;
-  } catch (err) {
-      console.error(`Error during token generation.`);
-      throw err;
-  } 
-}
-
-/**
- * Asynchronous method to verify is a plainText string 
- * has the same hash as the store hash
- *
- * @param {*} plainTextPassword
- * @param {*} hashToMatchWith
- * @returns {Prommise} Valid or not boolean
- */
-async function isValidPassword(plainTextPassword, hashToMatchWith) {
-  return await bcrypt.compare(plainTextPassword, hashToMatchWith);
-}
 
 /**
  * Helper function to validate user form for registration
@@ -110,7 +79,7 @@ module.exports = {
         return createError(403, err.message);
       })
       .then((user)=>{
-        return isValidPassword(password, user.password);
+        return utils.isValidPassword(password, user.password);
       })
       .then((isValidPassword)=>{
         if(!isValidPassword) throw new Error ('Invalid password given');
@@ -122,7 +91,7 @@ module.exports = {
         return createError(403, err.message);
       })
       .then ((matchedUser)=> {
-        return jwtSign(matchedUser.id);
+        return utils.jwtSign(matchedUser.id);
       })
       .then ((token) => {
         console.log("Token: " + token);
