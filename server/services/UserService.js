@@ -95,11 +95,11 @@ module.exports = {
       })
       .then ((token) => {
         console.log("Token: " + token);
-        resolve({user: matchedUser, token: token});
+        return resolve({user: matchedUser, token: token});
       })
       .catch ((err) => {
         console.log(err);
-        reject(createError(500, "Token generation failed"));
+        return reject(createError(500, "Token generation failed"));
       });
     })
   }

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const AuthController = require('../../controllers/pg/AuthController');
-const AuthController = require('../../controllers/pg/GroupController');
+const GroupController = require('../../controllers/pg/GroupController');
 
 
 // General apis
