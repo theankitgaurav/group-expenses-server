@@ -29,6 +29,14 @@ function validateUserLoginData(userObj) {
 
 
 module.exports = {
+  getUser: async (userId)=>{
+    try {
+      return await User.findOne({where: {id: userId}})
+    } catch (err) {
+      console.error("Error fetching user", err);
+      throw err;
+    }
+  },
   registerUser: async (userObj)=>{
     if (!isRegisterDataValid(userObj)) {
       throw new Error ("Incorrect form data for user registration.");

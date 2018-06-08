@@ -12,7 +12,6 @@ function validateGroupFormData (requestObj) {
         };
         let groupObj = {}
         groupObj.name = groupBody.name;
-        groupObj.url = "groupurl";
         groupObj.ownerId = requestObj.userId;
         return resolve(groupObj);
     })
@@ -59,30 +58,23 @@ module.exports = {
                 console.error("Invalid group creation form data: ", err);
                 reject(err)})
             .then((groupInput)=>{
+                // FIXME: Add transaction for creating group and adding to userVsGroupMap
                 Group.create(groupInput)
                 .then((createdGroup)=> {
-                    // user.addProject(project, { through: { status: 'started' }})
-                    User.findOne({where: {id: req.userId}})
-                    .then((user)=>{
-                        user.addGroup(createdGroup)
-                        .then((result1)=>{
-                            console.log("Group added to map");
-                            return resolve(createdGroup)})
-                        })
-                        .catch((err)=>{
-                            console.error("User vs group map failed, ", err);
-                            return reject(err);
-                        })
+                    req.user.addGroup(createdGroup)
+                    .then((userGroupMap)=>{
+                        return resolve(createdGroup);
                     })
                     .catch((err)=>{
-                        console.error("User not found with userid ", err);
+                        console.error("User vs group map failed, ", err);
                         return reject(err);
                     })
-
-                .catch(err=>{
-                    console.error("Error creating group: ", err);
-                    reject(err)});
-            })
+                    .catch(err=>{
+                        console.error("Error creating group: ", err);
+                        reject(err)
+                    });                
+                })
+            });
         });
     }
 }

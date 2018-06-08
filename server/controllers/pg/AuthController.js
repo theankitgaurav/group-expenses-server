@@ -37,12 +37,21 @@ module.exports = {
 
         utils.jwtVerify(tokenFromUser , process.env.JWT_SECRET)
         .then((decoded)=>{
-            req.userId = decoded.id;
-            return next();
+            return decoded;
         })
         .catch((err)=>{
-            console.error(`Error while verifying jwt`, err);
             return next(createError(401, `Bad token.`));
+        })
+        .then((decoded)=>{
+            return UserService.getUser(decoded.id)
+        })
+        .then((user)=>{
+            req.user = user;
+            req.userId = user.id;
+            next();
+        })
+        .catch((err)=>{
+            next(createError(403, "Token doesn't match any user"));
         })
     }
 }

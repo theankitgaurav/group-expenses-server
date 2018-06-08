@@ -48,6 +48,6 @@ module.exports = {
     return await bcrypt.compare(plainTextPassword, hashToMatchWith);
   },
   jwtVerify: async function (tokenFromUser) {
-    return jwt.verify(tokenFromUser , process.env.JWT_SECRET);
+    return await jwt.verify(tokenFromUser , process.env.JWT_SECRET);
   } 
 }
