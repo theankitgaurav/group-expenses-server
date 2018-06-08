@@ -29,7 +29,7 @@ function validateUserLoginData(userObj) {
 
 
 module.exports = {
-  registerUser: (userObj)=>{
+  registerUser: async (userObj)=>{
     if (!isRegisterDataValid(userObj)) {
       throw new Error ("Incorrect form data for user registration.");
     }
@@ -82,7 +82,7 @@ module.exports = {
         return utils.isValidPassword(password, user.password);
       })
       .then((isValidPassword)=>{
-        if(!isValidPassword) throw new Error ('Invalid password given');
+        if(!isValidPassword) reject (new Error ('Invalid password given'));
         console.log("Password matched");
         return matchedUser;
       })

@@ -24,9 +24,9 @@ module.exports = {
   jwtSign: async function (payload) {
     try {
       const token = await jwt.sign({
-        data: payload
+        id: payload
       }, process.env.JWT_SECRET, {
-        expiresIn: '1h'
+        expiresIn: '1d'
       });
       console.log(`Token generated sucessfully.`);
       return token;

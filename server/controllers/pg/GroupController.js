@@ -4,7 +4,7 @@ const GroupService = require('../../services/GroupService');
 
 module.exports = {
     async getGroups (req, res, next) {
-        const userId = req.query.userId;
+        const userId = req.userId;
         if (!userId) {
             console.log("userId not provided in getGroups request");
             return next(createError(403, "Incorrect request."));
@@ -22,7 +22,7 @@ module.exports = {
         });
     },
     async getGroupById (req, res, next) {
-        const userId = req.query.userId;
+        const userId = req.userId;
         const groupId = req.params.groupId;
 
         if (!userId || !groupId) {
@@ -42,6 +42,18 @@ module.exports = {
         })
         .catch((err)=>{
             console.error("Error fetching group by userId and groupId", err);
+            return next(err);
+        })
+    },
+    async createGroup (req, res, next) {
+        GroupService.createGroup(req)
+        .then((group)=>{
+            return res.status(200).json({
+                "msg": `Group ${group.name} created`,
+                "data": group
+            })
+        })
+        .catch((err)=>{
             return next(err);
         })
     }

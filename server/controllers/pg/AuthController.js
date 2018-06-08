@@ -34,9 +34,10 @@ module.exports = {
         if (tokenFromUser == null || tokenFromUser == undefined){
             return next(createError(401, `Missing token.`));
         }
+
         utils.jwtVerify(tokenFromUser , process.env.JWT_SECRET)
-        .then((res)=>{
-            console.log(`JWT verified.`);
+        .then((decoded)=>{
+            req.userId = decoded.id;
             return next();
         })
         .catch((err)=>{

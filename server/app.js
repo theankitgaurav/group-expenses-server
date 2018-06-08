@@ -5,7 +5,6 @@ const path = require('path');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const app = express();
 
 // Allow the app to use CORS
@@ -17,20 +16,6 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// setup db connection
-let db_uri = process.env.DB_URI;
-let db_name = process.env.DB_DATABASE;
-// if(app.get('env') == 'development') {
-//   db_uri = 'mongodb://localhost:27017/Group-Expenses-Dev';
-//   db_name = 'Group-Expenses-Dev';
-// }
-mongoose.connect(db_uri);
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log("DB connection OK.");
-});
 
 
 // Routers assigned here

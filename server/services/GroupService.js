@@ -4,6 +4,20 @@ const db = require('../db/models/index');
 const User = require('../db/models').User;
 const Group = require('../db/models').Group;
 
+function validateGroupFormData (requestObj) {
+    const groupBody = requestObj.body;
+    return new Promise ((resolve, reject)=>{
+        if (!groupBody.name || groupBody.name.trim() == '') {
+            return reject (createError(403, "Group name can't be empty"))
+        };
+        let groupObj = {}
+        groupObj.name = groupBody.name;
+        groupObj.url = "groupurl";
+        groupObj.ownerId = requestObj.userId;
+        return resolve(groupObj);
+    })
+}
+
 module.exports = {
     async getGroupsWithFilters(userId, groupId, ...args) {
         let userFilter = {status: "active"};
@@ -36,5 +50,39 @@ module.exports = {
                 return reject(err);
             })
         })
+    },
+    createGroup (req) {
+        return new Promise((resolve, reject) => {
+            validateGroupFormData(req)
+            .then(groupInput=>groupInput)
+            .catch((err)=>{
+                console.error("Invalid group creation form data: ", err);
+                reject(err)})
+            .then((groupInput)=>{
+                Group.create(groupInput)
+                .then((createdGroup)=> {
+                    // user.addProject(project, { through: { status: 'started' }})
+                    User.findOne({where: {id: req.userId}})
+                    .then((user)=>{
+                        user.addGroup(createdGroup)
+                        .then((result1)=>{
+                            console.log("Group added to map");
+                            return resolve(createdGroup)})
+                        })
+                        .catch((err)=>{
+                            console.error("User vs group map failed, ", err);
+                            return reject(err);
+                        })
+                    })
+                    .catch((err)=>{
+                        console.error("User not found with userid ", err);
+                        return reject(err);
+                    })
+
+                .catch(err=>{
+                    console.error("Error creating group: ", err);
+                    reject(err)});
+            })
+        });
     }
 }
