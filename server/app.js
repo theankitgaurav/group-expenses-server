@@ -19,9 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 
 
 // Routers assigned here
-// const apiRouter = require('./routes/api');
-// app.use('/api', apiRouter);
-const apiRouter = require('./routes/v2/api');
+const apiRouter = require('./routes/api');
 app.use('/', apiRouter);
 
 

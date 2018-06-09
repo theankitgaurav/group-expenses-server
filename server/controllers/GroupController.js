@@ -1,6 +1,6 @@
 const createError = require('http-errors');
-const utils = require('../../utils/utils');
-const GroupService = require('../../services/GroupService');
+const utils = require('../utils/utils');
+const GroupService = require('../services/GroupService');
 
 module.exports = {
     async getGroups (req, res, next) {
