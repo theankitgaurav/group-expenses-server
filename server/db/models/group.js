@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     url: DataTypes.STRING,
     ownerId: {
-      type: DataTypes.INTEGER, // FIXME: Should be foreign key restrained
+      type: DataTypes.INTEGER,
       references: {
         model: 'User',
         key: 'id'
