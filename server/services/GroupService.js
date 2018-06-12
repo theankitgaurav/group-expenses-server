@@ -18,6 +18,14 @@ function validateGroupFormData (requestObj) {
 }
 
 module.exports = {
+    async isOwner (groupId, userId) {
+        Group.findOne({where: {id: groupId}})
+        .then((group)=>{
+            if (!group) return reject(createError(404, `Group doesn't exist with id: ${groupId}`));
+            if (group.ownerId !== userId) return reject(createError(403, `User is not an owner of group with id: ${groupId}`));
+            return resolve(group);
+        })
+    },
     async getGroupsWithFilters(userId, groupId, ...args) {
         let userFilter = {status: "active"};
         let groupFilter = {status: "active"};

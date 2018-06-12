@@ -3,6 +3,18 @@ const utils = require('../utils/utils');
 const GroupService = require('../services/GroupService');
 
 module.exports = {
+    async isOwner (req, res, next) {
+        const userId = req.user.id;
+        const groupId = req.params.groupId;
+        
+        GroupService.isOwner(groupId, userId)
+        .then ((result)=>{
+            return next();
+        })
+        .catch((err)=>{
+            return next(err);
+        })
+    },
     async getGroups (req, res, next) {
         const userId = req.userId;
         if (!userId) {
