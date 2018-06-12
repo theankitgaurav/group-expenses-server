@@ -18,6 +18,18 @@ function validateGroupFormData (requestObj) {
 }
 
 module.exports = {
+    async isUserMemberOfGroup (user, groupId) {
+        return new Promise((resolve, reject)=>{
+            user.getGroups({where: {id: groupId}})
+            .then(association=>{
+                return resolve(association !== null); // return true or false based on whether association exists or not
+            })
+            .catch(err=>{
+                console.error('Error fetching user vs group map: ', err);
+                return reject(err);
+            });
+        });
+    },
     async isOwner (groupId, userId) {
         Group.findOne({where: {id: groupId}})
         .then((group)=>{

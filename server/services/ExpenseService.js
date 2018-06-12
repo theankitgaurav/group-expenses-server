@@ -40,35 +40,22 @@ async function saveExpense (expenseForm) {
 }
 
 module.exports = {
-  async getExpenses (req, userId, groupId) {
+  async getExpensesByGroupId (groupId) {
     return new Promise((resolve, reject)=>{
-      req.user.getGroups({where: {id: groupId}})
-      .then((userGroupMap)=>{
-        if(userGroupMap.length <=0) {
-          return reject(createError("403", "User not member of group with id: "+groupId));
-        }
-        return userGroupMap;
-      })
-      .then((userGroupMap)=>{
-        console.log('userVsGropup', userGroupMap);
-        return Expense.findAll({
-          attributes: ['category', 'amount', 'details', 'paidBy', 'paidOn'],
-          where: {GroupId: groupId}})
-      })
-      .catch((err)=>{
-        console.log("Error fetching map of userId and group Id", err);
-        return reject(500, "Error fetching map of userId and group Id")
-      })
-      .then((expenses)=>{
+
+      Expense.findAll({
+        attributes: ['category', 'amount', 'details', 'paidBy', 'paidOn'],
+        where: {GroupId: groupId}})
+      .then(expenses=>{
         console.log('expenses', expenses);
         return resolve(expenses);
       })
       .catch((err)=>{
         console.error("Error while fetching expenses based on groupId", err);
-        return reject(createError(500, "Error while fetching expenses based on groupId and userId"));
-      })
+        return reject(err);
+      });
 
-    })
+    });
   },
 
   async addExpense (req) {
@@ -95,11 +82,40 @@ module.exports = {
   async getCategories() {
     try{
       const categories = await Expense.findAll({attributes: ['category']});
-      return _.uniq(categories);
+      return _.uniq(categories).map(el=>el.category);
     } catch (err) {
       console.error(`Error in processing getCategories service`, err);
       return createError(500, "Error fetching categories");
     }
+  },
 
+  /**
+   * This method fetches list of all expenses related to a user
+   * based on the condition that either the expense should be made 
+   * by them or in a group they are an active user of
+   *
+   * @param {*} user
+   * @returns
+   */
+  async getExpensesForUser(user) {
+    return new Promise((resolve, reject)=>{
+      Promise.all([
+        user.getGroups(),
+        Expense.findAll({attributes: ['id','category', 'amount', 'details', 'GroupId', 'paidBy', 'enteredBy', 'paidOn']})
+      ])
+      .then(results=>{
+        const groups = results[0];
+        console.log('Groups: ', groups.map(group=>group.id))
+        const expenses = results[1];
+        const expensesForUser = expenses.filter(expense=>{
+          return groups.map(group=>group.id).includes(expense.GroupId);
+        })
+        return resolve(expensesForUser);
+      })
+      .catch(err=>{
+        console.log('Error fetching list of expenses for user: ', err);
+        return reject(createError(500, 'Error fetching list of expenses for user'));
+      });
+    });
   }
 }

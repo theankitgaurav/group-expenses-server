@@ -4,9 +4,39 @@ const GroupService = require('../services/GroupService');
 const ExpenseService = require('../services/ExpenseService');
 
 module.exports = {
-  async getExpenses (req, res, next) {
-    const groupId = req.query.groupId;
-    ExpenseService.getExpenses(req, req.user.userId, groupId)
+  async isViewable (req, res, next) {
+    // FIXME: Add correct implementation below
+    // should only go to next route if expense belongs 
+    // to a group the user is a member of 
+    return next();
+  },
+  async isModifiable (req, res, next) {
+    // FIXME: Add correct implementation below
+    // should only go to next route if expense is entered by user
+    return next();
+  },
+  async deleteExpenseById (req, res, next) {
+    // TODO: Add implementation below
+  },
+  async getExpenseById (req, res, next) {
+    // TODO: Add implementation below
+  },
+
+  async getExpensesForUser (req, res, next) {
+    const user = req.user;
+    ExpenseService.getExpensesForUser(user)
+    .then(expenses=>{
+      if(!expenses) return next(createError(404, "No expenses related to user"));
+      return res.status(200).json({
+        "msg": `${expenses.length} expenses fetched`,
+        "data": expenses
+      })
+    })
+    .catch(err=> next(err));
+  },
+  async getExpensesByGroupId (req, res, next) {
+    const groupId = req.params.groupId;
+    ExpenseService.getExpensesByGroupId(groupId)
     .then((expenses)=>{
       if(!expenses) return next(createError(404, "No matching expenses"))
       return res.status(200).json({

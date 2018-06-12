@@ -6,20 +6,20 @@ const ExpenseController = require('../controllers/ExpenseController');
 
 
 // General apis
-router.get('/', (req, res, next)=>{ res.json({"msg": 'Hello world.'}); });
+router.get('/', (req, res, next)=>{ res.json({"msg": 'Hello from group expenses.'}); });
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 
-// Apis for groups crud
 router.get("/group", AuthController.isAuthenticated, GroupController.getGroups);
 router.get("/group/:groupId", AuthController.isAuthenticated, GroupController.getGroupById);
 router.post("/group/", AuthController.isAuthenticated, GroupController.createGroup);
-router.delete("/group/:groupId", AuthController.isAuthenticated, GroupController.isOwner, GroupController.createGroup);
+router.delete("/group/:groupId", AuthController.isAuthenticated, GroupController.isModifiable, GroupController.deleteGroupById);
+router.get("/group/:groupId/expense", AuthController.isAuthenticated, GroupController.isAuthorized, ExpenseController.getExpensesByGroupId);
 
-// Apis for expense crud
-router.get("/expense", AuthController.isAuthenticated, ExpenseController.getExpenses);
+router.get("/expense", AuthController.isAuthenticated, ExpenseController.getExpensesForUser);
+router.get("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.isViewable, ExpenseController.getExpenseById);
 router.post("/expense", AuthController.isAuthenticated, ExpenseController.createExpense);
-// router.delete("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.deleteExpense);
+router.delete("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.isModifiable, ExpenseController.deleteExpenseById);
 router.get("/expense/category", ExpenseController.getCategories);
 
 module.exports = router;

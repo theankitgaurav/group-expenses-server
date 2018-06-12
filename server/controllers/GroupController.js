@@ -3,7 +3,22 @@ const utils = require('../utils/utils');
 const GroupService = require('../services/GroupService');
 
 module.exports = {
-    async isOwner (req, res, next) {
+    async isAuthorized (req, res, next) {
+        const groupId = req.params.groupId;
+        const user = req.user;
+
+        GroupService.isUserMemberOfGroup(user, groupId)
+        .then(isUserMemberOfGroup=>{
+            if(!isUserMemberOfGroup) {
+                return next(createError(403, 'User not member of group specified'))
+            }
+            return next();
+        })
+        .catch(err=>{
+            return next(err);
+        });
+    },
+    async isModifiable (req, res, next) {
         const userId = req.user.id;
         const groupId = req.params.groupId;
         
@@ -68,6 +83,9 @@ module.exports = {
         .catch((err)=>{
             return next(err);
         })
+    },
+    async deleteGroupById (req, res, next) {
+        // TODO: Add implementation below
     }
 };
 
