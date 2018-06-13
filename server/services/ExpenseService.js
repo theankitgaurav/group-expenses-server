@@ -12,7 +12,7 @@ function getExpenseForm (requestObject) {
   expenseForm.category = requestObject.body.expenseCategory;
   expenseForm.amount  = requestObject.body.expenseAmount;
   expenseForm.details = requestObject.body.expenseDetails;
-  expenseForm.GroupId = requestObject.body.expenseGroup;
+  expenseForm.group = requestObject.body.expenseGroup;
   expenseForm.paidBy = requestObject.body.expenseBy;
   expenseForm.paidOn = requestObject.body.expenseOn;
   expenseForm.enteredBy = requestObject.user.id;
@@ -45,7 +45,7 @@ module.exports = {
 
       Expense.findAll({
         attributes: ['category', 'amount', 'details', 'paidBy', 'paidOn'],
-        where: {GroupId: groupId}})
+        where: {group: groupId}})
       .then(expenses=>{
         console.log('expenses', expenses);
         return resolve(expenses);
@@ -101,14 +101,14 @@ module.exports = {
     return new Promise((resolve, reject)=>{
       Promise.all([
         user.getGroups(),
-        Expense.findAll({attributes: ['id','category', 'amount', 'details', 'GroupId', 'paidBy', 'enteredBy', 'paidOn']})
+        Expense.findAll()
       ])
       .then(results=>{
         const groups = results[0];
         console.log('Groups: ', groups.map(group=>group.id))
         const expenses = results[1];
         const expensesForUser = expenses.filter(expense=>{
-          return groups.map(group=>group.id).includes(expense.GroupId);
+          return groups.map(group=>group.id).includes(expense.group);
         })
         return resolve(expensesForUser);
       })

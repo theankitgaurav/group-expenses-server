@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     category: Sequelize.STRING,
     amount: Sequelize.BIGINT,
     details: Sequelize.STRING,
-    groupId: {
+    group: {
       type: Sequelize.INTEGER,
       references: { model: 'Groups', key: 'id' }
     },
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
 
   Expense.associate = function(models) {
-    Expense.belongsTo(models.Group);
+    Expense.belongsTo(models.Group, {foreignKey: 'group', targetKey: 'id'});
   };
   
   return Expense;

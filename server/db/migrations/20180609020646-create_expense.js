@@ -12,7 +12,7 @@ module.exports = {
       category: Sequelize.STRING,
       amount: Sequelize.BIGINT,
       details: Sequelize.STRING,
-      groupId: {
+      group: {
         type: Sequelize.INTEGER,
         references: { model: 'Groups', key: 'id' }
       },
@@ -25,7 +25,10 @@ module.exports = {
         references: { model: 'Users', key: 'id' }
       },
       paidOn: Sequelize.DATE,
-      status: {type: Sequelize.STRING, defaultValue: "NORMAL"}
+      status: {type: Sequelize.STRING, defaultValue: "NORMAL"},
+      // Timestamps
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE,
     });
 
   },
