@@ -1,11 +1,11 @@
 const env = require('dotenv').config();
 const createError = require('http-errors');
 const express = require('express');
-const path = require('path');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 const app = express();
+const {errorHandler} = require('./utils/winston-logger');
 
 // Allow the app to use CORS
 app.use(cors())
@@ -13,7 +13,7 @@ app.use(cors())
 app.use(helmet());
 
 // view engine setup
-app.use(morgan('dev'));
+app.use(morgan('common'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -33,8 +33,9 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+  
+  errorHandler.handleError(err);
 
-  // render the error page
   res.status(err.status || 500);
   res.json(err.message || 'Internal error.');
 });
