@@ -33,15 +33,17 @@ async function getExpenseForm (requestObject) {
  * @returns
  */
 function validateExpenseForm (expenseForm) {
-  Promise.all([
-    validateFieldsWithSchema(expenseForm),
-    validateGroup(expenseForm),
-    validatePaidBy(expenseForm)
-  ]).then((results)=>{
-    console.log("New Expense Input Validations Passed");
-    return resolve(results);
-  }).catch((err)=>{
-    return reject(new Error("INVALID_FORM_DATA_ERROR", err));
+  return new Promise((resolve, reject)=>{
+    Promise.all([
+      validateFieldsWithSchema(expenseForm),
+      validateGroup(expenseForm),
+      validatePaidBy(expenseForm)
+    ]).then((results)=>{
+      console.log("New Expense Input Validations Passed");
+      return resolve(results);
+    }).catch((err)=>{
+      return reject(new Error("INVALID_FORM_DATA_ERROR", err));
+    })
   })
 };
 
@@ -52,7 +54,7 @@ async function validateFieldsWithSchema(expenseForm) {
     details: Joi.string().min(1).max(200),
     group: Joi.number().integer().min(1),
     paidBy: Joi.number().integer().min(1),
-    paidOn: joi.data(),
+    paidOn: Joi.data(),
     enteredBy: Joi.number().integer().min(1)
   });
   Joi.validate(expenseForm, schema, (err, value) => {
