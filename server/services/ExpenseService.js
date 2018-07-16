@@ -1,40 +1,97 @@
 const createError = require('http-errors');
 const utils = require('../utils/utils');
 const _ = require('lodash');
+const Joi = require('joi');
 const db = require('../db/models/index');
 const User = require('../db/models').User;
 const Group = require('../db/models').Group;
 const Expense = require('../db/models').Expense;
+const GroupService = require('./GroupService');
+const UserService = require('./UserService');
 const Op = db.Sequelize.Op;
 
-function getExpenseForm (requestObject) {
-  const expenseForm = {};
-  expenseForm.category = requestObject.body.expenseCategory;
-  expenseForm.amount  = requestObject.body.expenseAmount;
-  expenseForm.details = requestObject.body.expenseDetails;
-  expenseForm.group = requestObject.body.expenseGroup;
-  expenseForm.paidBy = requestObject.body.expenseBy;
-  expenseForm.paidOn = requestObject.body.expenseOn;
-  expenseForm.enteredBy = requestObject.user.id;
-  return expenseForm;
+async function getExpenseForm (requestObject) {
+  try {
+    const expenseForm = {};
+    expenseForm.category = requestObject.body.expenseCategory;
+    expenseForm.amount  = requestObject.body.expenseAmount;
+    expenseForm.details = requestObject.body.expenseDetails;
+    expenseForm.group = requestObject.body.expenseGroup;
+    expenseForm.paidBy = requestObject.body.expenseBy;
+    expenseForm.paidOn = requestObject.body.expenseOn;
+    expenseForm.enteredBy = requestObject.user.id;
+    return expenseForm;
+  } catch (err) {
+    throw new Error("INSUFFICIENT_FORM_DATA_ERROR: ", err);
+  }
 }
 
+
 /**
- * TODO: Complete the validation using JOI
  *
  * @param {*} expenseForm
  * @returns
  */
 function validateExpenseForm (expenseForm) {
-  return new Promise((resolve, reject)=>{
-    resolve(true);
+  Promise.all([
+    validateFieldsWithSchema(expenseForm),
+    validateGroup(expenseForm),
+    validatePaidBy(expenseForm)
+  ]).then((results)=>{
+    console.log("New Expense Input Validations Passed");
+    return resolve(results);
+  }).catch((err)=>{
+    return reject(new Error("INVALID_FORM_DATA_ERROR", err));
+  })
+};
+
+async function validateFieldsWithSchema(expenseForm) {
+  const schema = Joi.object().keys({
+    category: Joi.string().min(2).max(20),
+    amount: Joi.number().integer().min(1).max(10000),
+    details: Joi.string().min(1).max(200),
+    group: Joi.number().integer().min(1),
+    paidBy: Joi.number().integer().min(1),
+    paidOn: joi.data(),
+    enteredBy: Joi.number().integer().min(1)
   });
+  Joi.validate(expenseForm, schema, (err, value) => {
+    if (err) {
+      throw err;
+    } else {
+      return value;
+    }
+  });
+};
+
+async function validatePaidBy(expenseForm) {
+  const groupId = expenseForm.group;
+  const paidBy = expenseForm.paidBy;
+  try {
+    const paidByUserObj = await UserService.getUser(paidBy)
+    return await GroupService.isUserMemberOfGroup(paidByUserObj, groupId);
+  } catch (err) {
+    throw new Error("Invalid paidBy user Provided", err);
+  }
 }
+
+async function validateGroup (expenseForm) {
+  const groupId = expenseForm.group;
+  const userId = expenseForm.enteredBy;
+  try {
+    return await !!GroupService.getGroupByUserIdAndGroupId(userId, groupId);
+  } catch (err) {
+    throw new Error("Invalid Group Provided", err);
+  }
+}
+
 
 async function saveExpense (expenseForm) {
   return new Promise((resolve, reject)=>{
     Expense.create(expenseForm)
-    .then((expense)=>{resolve(expense)})
+    .then((expense)=>{
+      console.log("New expense: ", expense);
+      resolve(expense)})
     .catch((err)=>{reject(err)});
   })
 }
@@ -59,24 +116,14 @@ module.exports = {
   },
 
   async addExpense (req) {
-    const expenseForm = getExpenseForm(req);
-    return new Promise((resolve, reject)=>{
-      validateExpenseForm(expenseForm)
-      .then((status)=>{
-        return saveExpense(expenseForm);
-       })
-      .catch((err)=>{
-        console.log(`Error while validating expense form: `, err);
-        return reject(err);
-      })
-      .then( (createdExpense)=>{
-        return resolve(createdExpense);
-      })
-      .catch((err)=>{
-        console.error(`Error saving new expense to db: `, err);
-        return reject(err);
-      })
-    })
+    try {
+      const expenseForm = await getExpenseForm(req);
+      await validateExpenseForm(expenseForm);
+      const createdExpense = await saveExpense(expenseForm);
+      return createdExpense;
+    } catch (err) {
+      return err;
+    }
   },
 
   async getCategories() {
@@ -107,6 +154,7 @@ module.exports = {
         const groups = results[0];
         console.log('Groups: ', groups.map(group=>group.id))
         const expenses = results[1];
+        console.log('Expenses: ', expenses)
         const expensesForUser = expenses.filter(expense=>{
           return groups.map(group=>group.id).includes(expense.group);
         })
