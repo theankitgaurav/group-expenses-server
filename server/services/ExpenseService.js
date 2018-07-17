@@ -9,6 +9,7 @@ const Expense = require('../db/models').Expense;
 const GroupService = require('./GroupService');
 const UserService = require('./UserService');
 const Op = db.Sequelize.Op;
+const Sequelize = require('sequelize');
 
 async function getExpenseForm (requestObject) {
   try {
@@ -143,29 +144,36 @@ module.exports = {
    * based on the condition that either the expense should be made 
    * by them or in a group they are an active user of
    *
-   * @param {*} user
+   * @param {User} user User model
    * @returns
    */
   async getExpensesForUser(user) {
-    return new Promise((resolve, reject)=>{
-      Promise.all([
-        user.getGroups(),
-        Expense.findAll()
-      ])
-      .then(results=>{
-        const groups = results[0];
-        console.log('Groups: ', groups.map(group=>group.id))
-        const expenses = results[1];
-        console.log('Expenses: ', expenses)
-        const expensesForUser = expenses.filter(expense=>{
-          return groups.map(group=>group.id).includes(expense.group);
-        })
-        return resolve(expensesForUser);
-      })
-      .catch(err=>{
-        console.log('Error fetching list of expenses for user: ', err);
-        return reject(createError(500, 'Error fetching list of expenses for user'));
+    try{
+      const userGroups = await user.getGroups();
+      const userGroupIdsArr = userGroups.map(el=>el.id) 
+      const expensesForUser = await Expense.findAll({
+        where: {group: {[Op.in]: userGroupIdsArr}},
+        include: [{
+          model: Group,
+          attributes: ["name", "id"]
+        }]
       });
-    });
+      return expensesForUser.map(adaptExpenseModel);
+    } catch(err) {
+      throw new Error("CAN'T FETCH EXPENSES FOR USER", err);
+    }
   }
+}
+
+function adaptExpenseModel(expenseModel) {
+  const expense = {};
+  expense.id = expenseModel.id;
+  expense.category = expenseModel.category;
+  expense.amount = expenseModel.amount;
+  expense.group = expenseModel.group;
+  expense.paidBy = expenseModel.paidBy;
+  expense.enteredBy = expenseModel.enteredBy;
+  expense.paidOn = expenseModel.paidOn;
+  expense.groupName = expenseModel.Group.name;
+  return expense;
 }
