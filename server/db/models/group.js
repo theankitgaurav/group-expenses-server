@@ -1,7 +1,4 @@
 'use strict';
-var Sequelize = require('sequelize');
-const User = require('./User')
-
 module.exports = (sequelize, DataTypes) => {
   var Group = sequelize.define('Group', {
     name: DataTypes.STRING,
