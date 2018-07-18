@@ -10,7 +10,7 @@ A simple web app to manage expenses
 + Entries from one member can't be modified by another
 + Past-dated entries/modifications in a group need to approved by at least one other member
 
-# Status Code => Constructor Name
+# HTTP Status Codes and Error Constructor Names
 - 400	BadRequest
 - 401	Unauthorized
 - 402	PaymentRequired
