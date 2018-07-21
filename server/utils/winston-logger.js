@@ -11,7 +11,7 @@ const logger = createLogger({
     myFormat
   ),
   transports: [
-    new transports.Console(),
+    // new transports.Console(),
     new transports.File({
       filename: 'combined-log.log'
     })

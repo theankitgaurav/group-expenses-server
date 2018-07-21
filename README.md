@@ -10,6 +10,14 @@ A simple web app to manage expenses
 + Entries from one member can't be modified by another
 + Past-dated entries/modifications in a group need to approved by at least one other member
 
+# Build Setup
+
+``` bash
+# run application in debug mode (windows)
+set DEBUG=http,mail,express:* & npm start 
+
+```
+
 # Status Code => Constructor Name
 400	BadRequest
 401	Unauthorized

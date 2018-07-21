@@ -12,7 +12,7 @@ app.use(cors())
 app.use(helmet());
 
 // view engine setup
-app.use(morgan('common'));
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
