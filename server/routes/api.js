@@ -1,9 +1,15 @@
 const express = require("express");
 const router = express.Router();
+const debug = require('debug')('router');
 const AuthController = require('../controllers/AuthController');
 const GroupController = require('../controllers/GroupController');
 const ExpenseController = require('../controllers/ExpenseController');
 
+// Log each request body for debugging
+router.use(function requestsLog(req, res, next){
+    debug("REQUEST BODY: ", req.body);
+    next();
+})
 
 // General apis
 router.get('/', (req, res, next)=>{ res.json({"msg": 'Hello from group expenses.'}); });
