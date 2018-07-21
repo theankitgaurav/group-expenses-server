@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const utils = require('../utils/utils');
+const errors = require('../utils/errors');
 const UserService = require('../services/UserService');
 
 module.exports = {
@@ -12,8 +13,7 @@ module.exports = {
                 "data": { userId: result }
             });
         } catch (err) {
-            console.log(err);
-            return next(createError(400, err.message));
+            return next(err);
         }
     },
     async login(req, res, next) {
@@ -25,14 +25,13 @@ module.exports = {
                 "data": {user: result.user, token: result.token}
             });
         } catch (err) {
-            console.log(err);
             return next(err);
         }
     },
     async isAuthenticated (req, res, next) {
         const tokenFromUser = req.headers['x-access-token'];
         if (tokenFromUser == null || tokenFromUser == undefined){
-            return next(createError(401, `Missing token.`));
+            return next(new errors.MissingTokenError());
         }
 
         utils.jwtVerify(tokenFromUser , process.env.JWT_SECRET)
@@ -40,7 +39,7 @@ module.exports = {
             return decoded;
         })
         .catch((err)=>{
-            return next(createError(401, `Bad token.`));
+            return next(new errors.BadTokenError());
         })
         .then((decoded)=>{
             return UserService.getUser(decoded.id)
@@ -51,7 +50,7 @@ module.exports = {
             next();
         })
         .catch((err)=>{
-            next(createError(403, "Token doesn't match any user"));
+            next(new errors.InvalidTokenError());
         })
     }
 }

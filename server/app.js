@@ -1,11 +1,10 @@
-const env = require('dotenv').config();
-const createError = require('http-errors');
+const errors = require('./utils/errors');
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 const app = express();
-const {errorHandler} = require('./utils/winston-logger');
+const ErrorHandler = require('./utils/errorHandler');
 
 // Allow the app to use CORS
 app.use(cors())
@@ -25,7 +24,7 @@ app.use('/', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404, 'The resource you are looking for does not exist'));
+  next(new errors.NotFoundError());
 });
 
 // error handler
@@ -34,10 +33,8 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   
-  errorHandler.handleError(err);
-
-  res.status(err.status || 500);
-  res.json(err.message || 'Internal error.');
+  const {statusCode, type, message} = new ErrorHandler().handleError(err);
+  res.status(statusCode).json({type, message})
 });
 
 module.exports = app;

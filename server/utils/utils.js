@@ -3,6 +3,13 @@ const jwt = require('jsonwebtoken');
 
 
 module.exports = {
+  /**
+   * Asynchronous function to hash a password string
+   * using BCrypt algorithm 
+   *
+   * @param {String} plainTextPassword which needs to be hashed
+   * @returns hashed password string or an error object
+   */
   hashPassword: function (plainTextPassword) {
     return new Promise(function (resolve, reject) {
       const saltRounds = 10;
@@ -19,7 +26,7 @@ module.exports = {
    * Asynchronous method to generate a jwt based on the default algorithm HS256
    * The secret key is fetched from environment variable
    * @param {any} payload 
-   * @returns {Prommise} Generated jwt or Error (eg: TokenExpiredError, JsonWebTokenError)
+   * @returns {Promise} Generated jwt or Error (eg: TokenExpiredError, JsonWebTokenError)
    */
   jwtSign: async function (payload) {
     try {
@@ -40,9 +47,9 @@ module.exports = {
    * Asynchronous method to verify is a plainText string 
    * has the same hash as the store hash
    *
-   * @param {*} plainTextPassword
-   * @param {*} hashToMatchWith
-   * @returns {Prommise} Valid or not boolean
+   * @param {String} plainTextPassword
+   * @param {String} hashToMatchWith
+   * @returns {Promise} Valid or not boolean
    */
   isValidPassword: async function (plainTextPassword, hashToMatchWith) {
     return await bcrypt.compare(plainTextPassword, hashToMatchWith);
