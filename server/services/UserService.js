@@ -1,6 +1,7 @@
-const createError = require('http-errors');
 const utils = require('../utils/utils');
 const db = require('../db/models/index');
+const errors = require('../utils/errors');
+
 const User = require('../db/models').User;
 const Group = require('../db/models').Group;
 
@@ -11,7 +12,7 @@ const Group = require('../db/models').Group;
  * @returns boolean stating valid or not
  */
 function isRegisterDataValid (userObj) {
-  if(userObj.name == "" || userObj.email == "" || userObj.password == "") return false;
+  if (userObj.name == "" || userObj.email == "" || userObj.password == "") return false;
   return true;
 }
 
@@ -39,7 +40,7 @@ module.exports = {
   },
   registerUser: async (userObj)=>{
     if (!isRegisterDataValid(userObj)) {
-      throw new Error ("Incorrect form data for user registration.");
+      throw new errors.BadRequestError("Incorrect form data for user registration.");
     }
 
     return new Promise((resolve, reject)=>{
@@ -61,54 +62,25 @@ module.exports = {
         console.log('Transaction has been committed for user registration flow.');
         resolve(result);
       }).catch(function (err) {
-        console.log("Transaction has been rolled back for user registration flow.");
-        console.error(err);
-        reject(new Error("User could not be saved into db", err));
+        console.log("Transaction has been rolled back for user registration flow.", err);
+        reject(new errors.InternalServerError("User could not be saved into db", err));
       });
 
     });
   },
 
-  loginUser: (userObj) => {
+  loginUser: async (userObj) => {
     const {email, password} = userObj;
     validateUserLoginData(userObj);
 
-    let matchedUser = null;
+    const userInDb = await User.findOne({ where: {email: email} });
+    if(!userInDb) throw new errors.NotFoundError('User does not exist');
+    
+    const isPasswordValid = await utils.isValidPassword(password, userInDb.password);
+    if(!isPasswordValid) throw new errors.AuthorizationError("Invalid Password");
 
-    return new Promise((resolve, reject)=>{
-      User.findOne({ where: {email: email} })
-      .then((user)=>{
-        if(!user) throw new Error ("User does not exist.");
-        console.log("User matched: " + user.email);
-        return matchedUser = user;
-      })
-      .catch((err)=>{
-        console.log(err);
-        return createError(403, err.message);
-      })
-      .then((user)=>{
-        return utils.isValidPassword(password, user.password);
-      })
-      .then((isValidPassword)=>{
-        if(!isValidPassword) reject (new Error ('Invalid password given'));
-        console.log("Password matched");
-        return matchedUser;
-      })
-      .catch ((err)=>{
-        console.log(err);
-        return createError(403, err.message);
-      })
-      .then ((matchedUser)=> {
-        return utils.jwtSign(matchedUser.id);
-      })
-      .then ((token) => {
-        console.log("Token: " + token);
-        return resolve({user: matchedUser, token: token});
-      })
-      .catch ((err) => {
-        console.log(err);
-        return reject(createError(500, "Token generation failed"));
-      });
-    })
+    const token = await utils.jwtSign(userInDb.id);
+    
+    return {user: userInDb, token: token};
   }
 };

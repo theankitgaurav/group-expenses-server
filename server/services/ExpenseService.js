@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const errors = require('../utils/errors');
 const utils = require('../utils/utils');
 const _ = require('lodash');
 const Joi = require('joi');
@@ -25,6 +26,11 @@ async function getExpenseForm (requestObject) {
   } catch (err) {
     throw new Error("INSUFFICIENT_FORM_DATA_ERROR: ", err);
   }
+}
+
+function enteredBeforeOneDay (expense) {
+  const durationAfterEntryInDays = utils.getTimeDifference(new Date, expense.createdAt, true);
+  return durationAfterEntryInDays >= 1;
 }
 
 
@@ -139,6 +145,46 @@ module.exports = {
     }
   },
 
+  async getExpenseByIdAndUser(expenseId, user) {
+    const userGroups = await user.getGroups();
+    const userGroupIdsArr = userGroups.map(el=>el.id) 
+    const expense = await Expense.findOne({
+      where: {id: expenseId, status: 'NORMAL'},
+      include: [{
+        model: Group,
+        attributes: ["name", "id"]
+      }]
+    });
+
+    if (!expense) throw new errors.NotFoundError();
+
+    if (!userGroupIdsArr.includes(expense.Group.id)) throw new errors.AuthorizationError();
+
+    return adaptExpenseModel(expense);
+  },
+
+  async deleteExpenseByIdAndUser(expenseId, user) {
+    const expenseInDb = await Expense.findOne({
+      where: {id: expenseId}
+    });
+
+    if (!expenseInDb) throw new errors.NotFoundError();
+
+    // Disallow deletion of expense entered by other users
+    if (expenseInDb.enteredBy !== user.id) throw new errors.AuthorizationError("You can't delete entries by other users");
+
+    // Disallow deletion of expenses entered one day before now
+    if (enteredBeforeOneDay(expenseInDb)) throw new errors.AuthorizationError("Expenses entered before one day can not be deleted");
+
+    expenseInDb.update({ status: 'CANCEL' })
+    .then(()=>{
+      return true;
+    })
+    .catch((err)=>{
+      throw new errors.InternalServerError(`Could not delete expense with id: ${expenseId}`, err);
+    });
+  },
+
   /**
    * This method fetches list of all expenses related to a user
    * based on the condition that either the expense should be made 
@@ -152,7 +198,7 @@ module.exports = {
       const userGroups = await user.getGroups();
       const userGroupIdsArr = userGroups.map(el=>el.id) 
       const expensesForUser = await Expense.findAll({
-        where: {group: {[Op.in]: userGroupIdsArr}},
+        where: {status: 'NORMAL', group: {[Op.in]: userGroupIdsArr}},
         include: [{
           model: Group,
           attributes: ["name", "id"]
@@ -170,7 +216,7 @@ function adaptExpenseModel(expenseModel) {
   expense.id = expenseModel.id;
   expense.category = expenseModel.category;
   expense.amount = expenseModel.amount;
-  expense.group = expenseModel.group;
+  expense.group = expenseModel.Group.id;
   expense.paidBy = expenseModel.paidBy;
   expense.enteredBy = expenseModel.enteredBy;
   expense.paidOn = expenseModel.paidOn;
