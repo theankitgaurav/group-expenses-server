@@ -1,7 +1,4 @@
 'use strict';
-var Sequelize = require('sequelize');
-const User = require('./User')
-
 module.exports = (sequelize, DataTypes) => {
   var Group = sequelize.define('Group', {
     name: DataTypes.STRING,
@@ -9,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     ownerId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'User',
+        model: 'Users',
         key: 'id'
       }
     },

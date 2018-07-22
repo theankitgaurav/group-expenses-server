@@ -1,5 +1,5 @@
-# group-expenses
-A simple web app to manage expenses
+# Group Expenses
+This is the REST backend for the group-expenses PWA client
 
 # Features
 ## General Features
