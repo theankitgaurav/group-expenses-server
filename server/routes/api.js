@@ -24,9 +24,9 @@ router.delete("/group/:groupId", AuthController.isAuthenticated, GroupController
 router.get("/group/:groupId/expense", AuthController.isAuthenticated, GroupController.isAuthorized, ExpenseController.getExpensesByGroupId);
 
 router.get("/expense", AuthController.isAuthenticated, ExpenseController.getExpensesForUser);
-router.get("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.isViewable, ExpenseController.getExpenseById);
+router.get("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.getExpenseById);
 router.post("/expense", AuthController.isAuthenticated, ExpenseController.createExpense);
-router.delete("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.isModifiable, ExpenseController.deleteExpenseById);
+router.delete("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.deleteExpenseById);
 router.get("/expense/category", ExpenseController.getCategories);
 
 module.exports = router;

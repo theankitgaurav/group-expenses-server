@@ -28,6 +28,11 @@ async function getExpenseForm (requestObject) {
   }
 }
 
+function enteredBeforeOneDay (expense) {
+  const durationAfterEntryInDays = utils.getTimeDifference(new Date, expense.createdAt, true);
+  return durationAfterEntryInDays >= 1;
+}
+
 
 /**
  *
@@ -158,6 +163,28 @@ module.exports = {
     return adaptExpenseModel(expense);
   },
 
+  async deleteExpenseByIdAndUser(expenseId, user) {
+    const expenseInDb = await Expense.findOne({
+      where: {id: expenseId}
+    });
+
+    if (!expenseInDb) throw new errors.NotFoundError();
+
+    // Disallow deletion of expense entered by other users
+    if (expenseInDb.enteredBy !== user.id) throw new errors.AuthorizationError("You can't delete entries by other users");
+
+    // Disallow deletion of expenses entered one day before now
+    if (enteredBeforeOneDay(expenseInDb)) throw new errors.AuthorizationError("Expenses entered before one day can not be deleted");
+
+    expenseInDb.update({ status: 'CANCEL' })
+    .then(()=>{
+      return true;
+    })
+    .catch((err)=>{
+      throw new errors.InternalServerError(`Could not delete expense with id: ${expenseId}`, err);
+    });
+  },
+
   /**
    * This method fetches list of all expenses related to a user
    * based on the condition that either the expense should be made 
@@ -171,7 +198,7 @@ module.exports = {
       const userGroups = await user.getGroups();
       const userGroupIdsArr = userGroups.map(el=>el.id) 
       const expensesForUser = await Expense.findAll({
-        where: {group: {[Op.in]: userGroupIdsArr}},
+        where: {status: 'NORMAL', group: {[Op.in]: userGroupIdsArr}},
         include: [{
           model: Group,
           attributes: ["name", "id"]

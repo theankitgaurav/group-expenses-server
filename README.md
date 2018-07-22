@@ -10,6 +10,9 @@ A simple web app to manage expenses
 + Entries from one member can't be modified by another
 + Past-dated entries/modifications in a group need to approved by at least one other member
 
+# Todo
++ Make the number of days afte which entries will be freezed configurable on group level
+
 # Build Setup
 
 ``` bash

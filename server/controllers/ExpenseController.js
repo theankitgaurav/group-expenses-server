@@ -4,19 +4,23 @@ const GroupService = require('../services/GroupService');
 const ExpenseService = require('../services/ExpenseService');
 
 module.exports = {
-  async isViewable (req, res, next) {
-    // FIXME: Add correct implementation below
-    // should only go to next route if expense belongs 
-    // to a group the user is a member of 
-    return next();
-  },
-  async isModifiable (req, res, next) {
-    // FIXME: Add correct implementation below
-    // should only go to next route if expense is entered by user
-    return next();
-  },
+  /**
+   *
+   *
+   * @param {*} req ExpenseId as parameter
+   * @param {*} res success message or http error with code and message
+   * @param {*} next
+   */
   async deleteExpenseById (req, res, next) {
-    // TODO: Add implementation below
+    try {
+      const expenseId = req.params.expenseId;
+      await ExpenseService.deleteExpenseByIdAndUser(expenseId, req.user);
+      res.status(200).json({
+        "message": `Expense deleted successfully`
+      });
+    } catch (err) {
+      next(err);
+    }
   },
   async getExpenseById (req, res, next) {
     try {

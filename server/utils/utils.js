@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const moment = require('moment');
 
 module.exports = {
   /**
@@ -56,5 +56,11 @@ module.exports = {
   },
   jwtVerify: async function (tokenFromUser) {
     return await jwt.verify(tokenFromUser , process.env.JWT_SECRET);
-  } 
+  },
+  getTimeDifference: function (startDate, endDate, inDays=false) {
+    const now = moment(startDate);
+    const end = moment(endDate);
+    const duration = inDays? now.diff(end, 'days') : now.diff(end);
+    return duration;
+  }
 }
