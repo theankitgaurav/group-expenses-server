@@ -7,6 +7,7 @@ const ExpenseController = require('../controllers/ExpenseController');
 
 // Log each request body for debugging
 router.use(function requestsLog(req, res, next){
+    debug("REQUEST PARAMS: ", req.params);
     debug("REQUEST BODY: ", req.body);
     next();
 })

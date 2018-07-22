@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const errors = require('../utils/errors');
 const utils = require('../utils/utils');
 const _ = require('lodash');
 const Joi = require('joi');
@@ -139,6 +140,24 @@ module.exports = {
     }
   },
 
+  async getExpenseByIdAndUser(expenseId, user) {
+    const userGroups = await user.getGroups();
+    const userGroupIdsArr = userGroups.map(el=>el.id) 
+    const expense = await Expense.findOne({
+      where: {id: expenseId, status: 'NORMAL'},
+      include: [{
+        model: Group,
+        attributes: ["name", "id"]
+      }]
+    });
+
+    if (!expense) throw new errors.NotFoundError();
+
+    if (!userGroupIdsArr.includes(expense.Group.id)) throw new errors.AuthorizationError();
+
+    return adaptExpenseModel(expense);
+  },
+
   /**
    * This method fetches list of all expenses related to a user
    * based on the condition that either the expense should be made 
@@ -170,7 +189,7 @@ function adaptExpenseModel(expenseModel) {
   expense.id = expenseModel.id;
   expense.category = expenseModel.category;
   expense.amount = expenseModel.amount;
-  expense.group = expenseModel.group;
+  expense.group = expenseModel.Group.id;
   expense.paidBy = expenseModel.paidBy;
   expense.enteredBy = expenseModel.enteredBy;
   expense.paidOn = expenseModel.paidOn;

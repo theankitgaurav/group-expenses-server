@@ -19,7 +19,16 @@ module.exports = {
     // TODO: Add implementation below
   },
   async getExpenseById (req, res, next) {
-    // TODO: Add implementation below
+    try {
+      const expenseId = req.params.expenseId;
+      const expenseInDb = await ExpenseService.getExpenseByIdAndUser(expenseId, req.user);
+      res.status(200).json({
+        "message": `Expense fetched`,
+        "data": expenseInDb 
+      });
+    } catch (err) {
+      next(err);
+    }
   },
 
   async getExpensesForUser (req, res, next) {
