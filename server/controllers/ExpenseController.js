@@ -2,6 +2,7 @@ const createError = require('http-errors');
 const utils = require('../utils/utils');
 const GroupService = require('../services/GroupService');
 const ExpenseService = require('../services/ExpenseService');
+const errors = require('../utils/errors');
 
 module.exports = {
   /**
@@ -39,7 +40,7 @@ module.exports = {
     const user = req.user;
     ExpenseService.getExpensesForUser(user)
     .then(expenses=>{
-      if(!expenses) return next(createError(404, "No expenses related to user"));
+      if(!expenses) return next(new errors.NotFoundError("No expenses related to user"));
       return res.status(200).json({
         "msg": `${expenses.length} expenses fetched`,
         "data": expenses
@@ -47,24 +48,23 @@ module.exports = {
     })
     .catch(err=> next(err));
   },
-  async getExpensesByGroupId (req, res, next) {
+  async getExpensesByGroupId(req, res, next) {
     const groupId = req.params.groupId;
     ExpenseService.getExpensesByGroupId(groupId)
-    .then((expenses)=>{
-      if(!expenses) return next(createError(404, "No matching expenses"))
+      .then((expenses) => {
+        if (!expenses) return next(new errors.NotFoundError(`No matching expenses in group ${groupId}`));
       return res.status(200).json({
         "message": `${expenses.length} expenses fetched`,
         "data": expenses
       })
     })
-    .catch((err)=>{
+      .catch((err) => {
       return next(err);
     })
   },
   async createExpense (req, res, next) {
     ExpenseService.addExpense(req)
     .then((expense)=>{
-      if(!expense) return next(createError(404, "No matching expenses"))
       return res.status(200).json({
         "message": `Expense added`,
         "data": expense
@@ -77,7 +77,7 @@ module.exports = {
   async getCategories(req, res, next) {
     ExpenseService.getCategories()
     .then ((categories)=>{
-      if(!categories) return next(createError(404, "No categories exists"));
+      if(!categories) return next(new errors.NotFoundError("No categories exists"));
       return res.status(200).json({
         "message": `${categories.length} categories fetched`,
         "data": categories
