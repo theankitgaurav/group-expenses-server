@@ -18,8 +18,8 @@ app.use(express.urlencoded({ extended: false }));
 
 
 // Routers assigned here
-const apiRouter = require('./routes/api');
-app.use('/', apiRouter);
+const api = require('./routes');
+app.use('/', api);
 
 
 // catch 404 and forward to error handler

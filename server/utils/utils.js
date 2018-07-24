@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 
+const JWT_EXPIRY_DURATION = '1d';
+
 module.exports = {
   /**
    * Asynchronous function to hash a password string
@@ -33,13 +35,11 @@ module.exports = {
       const token = await jwt.sign({
         id: payload
       }, process.env.JWT_SECRET, {
-        expiresIn: '1d'
+        expiresIn: JWT_EXPIRY_DURATION
       });
-      console.log(`Token generated sucessfully.`);
       return token;
     } catch (err) {
-      console.error(`Error during token generation.`);
-      throw err;
+      throw new Error(`Error during token generation.`, err);
     }
   },
 
@@ -56,6 +56,17 @@ module.exports = {
   },
   jwtVerify: async function (tokenFromUser) {
     return await jwt.verify(tokenFromUser , process.env.JWT_SECRET);
+  },
+  /**
+   * TODO: JWTs don't have their own api to be invalidated.
+   * So a way to simulate the behavior will be to black-list them and store
+   * This should suffice as during token verification, on tokens not in 
+   * blacklist will be veified. Also, after JWT_EXPIRY_DURATION
+   *
+   * @param {String} tokenFromUser
+   */
+  jwtInvalidate: async function (tokenFromUser) {
+    // [NO-OP]
   },
   getTimeDifference: function (startDate, endDate, inDays=false) {
     const now = moment(startDate);

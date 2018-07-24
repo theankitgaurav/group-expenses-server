@@ -1,5 +1,5 @@
-# Group Expenses
-This is the REST backend for the group-expenses PWA client
+# group-expenses
+REST api to for the [Group Expenses PWA](https://github.com/ankitgaurav/pwa-client)
 
 # Features
 ## General Features
@@ -10,56 +10,20 @@ This is the REST backend for the group-expenses PWA client
 + Entries from one member can't be modified by another
 + Past-dated entries/modifications in a group need to approved by at least one other member
 
-# Todo
-+ Make the number of days afte which entries will be freezed configurable on group level
-
 # Build Setup
-
 ``` bash
 # run application in debug mode (windows)
-set DEBUG=http,mail,express:* & npm start 
+set DEBUG=router & npm start 
 
 ```
 
-# Status Code => Constructor Name
-400	BadRequest
-401	Unauthorized
-402	PaymentRequired
-403	Forbidden
-404	NotFound
-405	MethodNotAllowed
-406	NotAcceptable
-407	ProxyAuthenticationRequired
-408	RequestTimeout
-409	Conflict
-410	Gone
-411	LengthRequired
-412	PreconditionFailed
-413	PayloadTooLarge
-414	URITooLong
-415	UnsupportedMediaType
-416	RangeNotSatisfiable
-417	ExpectationFailed
-418	ImATeapot
-421	MisdirectedRequest
-422	UnprocessableEntity
-423	Locked
-424	FailedDependency
-425	UnorderedCollection
-426	UpgradeRequired
-428	PreconditionRequired
-429	TooManyRequests
-431	RequestHeaderFieldsTooLarge
-451	UnavailableForLegalReasons
-500	InternalServerError
-501	NotImplemented
-502	BadGateway
-503	ServiceUnavailable
-504	GatewayTimeout
-505	HTTPVersionNotSupported
-506	VariantAlsoNegotiates
-507	InsufficientStorage
-508	LoopDetected
-509	BandwidthLimitExceeded
-510	NotExtended
-511	NetworkAuthenticationRequired
+# Contribution Guide
+1. Fork the repo and ```npm install``` all deps
+2. Configure the environment variables (Or ask me for the same)
+3. Make changes in a specific branch and request to pull into master
+4. Please consider building once before submitting a PR
+
+# Development Guide
+- Changes in public APIs should always follow with a build and sanity test (Unit tests => My Salute)
+- Use ES6 for succint code (Google Style Guide)
+- Use of lodash, Joi etc is preferred over custom implementations

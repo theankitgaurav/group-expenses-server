@@ -6,22 +6,24 @@ const GroupController = require('../controllers/GroupController');
 const ExpenseController = require('../controllers/ExpenseController');
 
 // Log each request body for debugging
-router.use(function requestsLog(req, res, next){
+router.all('*', function (req, res, next) {
+    debug("REQUEST QUERY: ", req.query);
     debug("REQUEST PARAMS: ", req.params);
     debug("REQUEST BODY: ", req.body);
     next();
 })
 
 // General apis
-router.get('/', (req, res, next)=>{ res.json({"msg": 'Hello from group expenses.'}); });
+router.get('/', (req, res, next)=>{ res.status(200).json({"msg": 'Hello from group expenses.'}); });
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
+router.delete("/logout", AuthController.logout);
 
 router.get("/group", AuthController.isAuthenticated, GroupController.getGroups);
 router.get("/group/:groupId", AuthController.isAuthenticated, GroupController.getGroupById);
 router.post("/group/", AuthController.isAuthenticated, GroupController.createGroup);
-router.delete("/group/:groupId", AuthController.isAuthenticated, GroupController.isModifiable, GroupController.deleteGroupById);
-router.get("/group/:groupId/expense", AuthController.isAuthenticated, GroupController.isAuthorized, ExpenseController.getExpensesByGroupId);
+router.delete("/group/:groupId", AuthController.isAuthenticated, GroupController.deleteGroupById);
+router.get("/group/:groupId/expense", AuthController.isAuthenticated, ExpenseController.getExpensesByGroupId);
 
 router.get("/expense", AuthController.isAuthenticated, ExpenseController.getExpensesForUser);
 router.get("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.getExpenseById);
