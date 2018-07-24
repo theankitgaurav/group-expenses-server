@@ -1,5 +1,5 @@
 # group-expenses
-A simple web app to manage expenses
+REST api to for the [Group Expenses PWA](https://github.com/ankitgaurav/pwa-client)
 
 # Features
 ## General Features
@@ -10,13 +10,20 @@ A simple web app to manage expenses
 + Entries from one member can't be modified by another
 + Past-dated entries/modifications in a group need to approved by at least one other member
 
-# Todo
-+ Make the number of days afte which entries will be freezed configurable on group level
-
 # Build Setup
-
 ``` bash
 # run application in debug mode (windows)
-set DEBUG=http,mail,express:* & npm start 
+set DEBUG=router & npm start 
 
 ```
+
+# Contribution Guide
+1. Fork the repo and ```npm install``` all deps
+2. Configure the environment variables (Or ask me for the same)
+3. Make changes in a specific branch and request to pull into master
+4. Please consider building once before submitting a PR
+
+# Development Guide
+- Changes in public APIs should always follow with a build and sanity test (Unit tests => My Salute)
+- Use ES6 for succint code (Google Style Guide)
+- Use of lodash, Joi etc is preferred over custom implementations
