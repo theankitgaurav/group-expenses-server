@@ -1,6 +1,5 @@
 'use strict';
 var Sequelize = require('sequelize');
-const Group = require('./Group');
 
 module.exports = (sequelize, DataTypes) => {
   var Expense = sequelize.define('Expense', {
