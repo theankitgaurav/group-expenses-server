@@ -6,14 +6,14 @@ const GroupController = require('../controllers/GroupController');
 const ExpenseController = require('../controllers/ExpenseController');
 
 // Log each request body for debugging
-router.use(function requestsLog(req, res, next){
+router.all('*', function (req, res, next) {
     debug("REQUEST PARAMS: ", req.params);
     debug("REQUEST BODY: ", req.body);
     next();
 })
 
 // General apis
-router.get('/', (req, res, next)=>{ res.json({"msg": 'Hello from group expenses.'}); });
+router.get('/', (req, res, next)=>{ res.status(200).json({"msg": 'Hello from group expenses.'}); });
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 

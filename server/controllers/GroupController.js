@@ -2,6 +2,9 @@ const createError = require('http-errors');
 const utils = require('../utils/utils');
 const GroupService = require('../services/GroupService');
 
+// TODO: Use express-validator for validating and sanitizing user input
+// TODO: Avoid sending Request object to the service layer.
+
 module.exports = {
     async isAuthorized (req, res, next) {
         const groupId = req.params.groupId;
