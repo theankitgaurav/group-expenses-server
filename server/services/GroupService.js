@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const errors = require('../utils/errors');
 const utils = require('../utils/utils');
 const db = require('../db/models/index');
 const User = require('../db/models').User;
@@ -20,13 +21,22 @@ function validateGroupFormData (requestObj) {
 
 module.exports = {
     async getExpenseCategories(groupId) {
-        return await Expense.findAll({where: [{'group': groupId}], attributes: ['category'], group: 'category'});
+        // The line below return results as : [{category: 'Ration'}, {category: 'Water'}]
+        const categoriesObjArr = await Expense.findAll({
+            where: [{'group': groupId}], attributes: ['category'], group: 'category'
+        });
+
+        // Flattening as a plain array before returning as: ['Ration', 'Water']
+        if (!!categoriesObjArr) {
+            return categoriesObjArr.map(el=>el.category);
+        }
+        return [];
     },
     async isUserMemberOfGroup (user, groupId) {
         return new Promise((resolve, reject)=>{
             user.getGroups({where: {id: groupId}})
             .then(association=>{
-                return resolve(association !== null); // return true or false based on whether association exists or not
+                return resolve(association.length > 0); // return true or false based on whether association exists or not
             })
             .catch(err=>{
                 console.error('Error fetching user vs group map: ', err);
