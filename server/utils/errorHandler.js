@@ -2,7 +2,8 @@ const logger = require('./winston-logger');
 
 class ErrorHandler {
     handleError (err)  {
-        if (!!err.originalError) {
+        if (err.status == 500) {
+            logger.error(err);
             logger.error(err.originalError);
         } else {
             logger.error(err);
