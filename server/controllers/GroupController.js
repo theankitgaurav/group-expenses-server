@@ -1,11 +1,28 @@
 const createError = require('http-errors');
 const utils = require('../utils/utils');
 const GroupService = require('../services/GroupService');
+const errors = require('../utils/errors');
 
 // TODO: Use express-validator for validating and sanitizing user input
 // TODO: Avoid sending Request object to the service layer.
 
 module.exports = {
+    async getExpenseCategoriesOfGroup(req, res, next) {
+      try {
+          const groupId = req.params.groupId;
+          const isUserMemberOfGroup = await GroupService.isUserMemberOfGroup(req.user, groupId);
+          if (!isUserMemberOfGroup) {
+              throw new errors.ForbiddenError(`User not a member of group with id: ${groupId}`);
+          }           
+          const categories = await GroupService.getExpenseCategories(groupId);
+          return res.status(200).json({
+            "message": `${categories.length} categories fetched`,
+            "data": categories
+          });
+      } catch (err) {
+          return next(err);
+      }
+    },
     async isAuthorized (req, res, next) {
         const groupId = req.params.groupId;
         const user = req.user;

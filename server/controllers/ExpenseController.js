@@ -73,18 +73,5 @@ module.exports = {
     .catch((err)=>{
       return next(err);
     })
-  },
-  async getCategories(req, res, next) {
-    ExpenseService.getCategories()
-    .then ((categories)=>{
-      if(!categories) return next(new errors.NotFoundError("No categories exists"));
-      return res.status(200).json({
-        "message": `${categories.length} categories fetched`,
-        "data": categories
-      })
-    })
-    .catch((err)=>{
-      return next(err);
-    })
   }
 }
