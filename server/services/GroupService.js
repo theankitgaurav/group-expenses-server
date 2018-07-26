@@ -3,6 +3,7 @@ const utils = require('../utils/utils');
 const db = require('../db/models/index');
 const User = require('../db/models').User;
 const Group = require('../db/models').Group;
+const Expense = require('../db/models').Expense;
 
 function validateGroupFormData (requestObj) {
     const groupBody = requestObj.body;
@@ -18,6 +19,9 @@ function validateGroupFormData (requestObj) {
 }
 
 module.exports = {
+    async getExpenseCategories(groupId) {
+        return await Expense.findAll({where: [{'group': groupId}], attributes: ['category'], group: 'category'});
+    },
     async isUserMemberOfGroup (user, groupId) {
         return new Promise((resolve, reject)=>{
             user.getGroups({where: {id: groupId}})

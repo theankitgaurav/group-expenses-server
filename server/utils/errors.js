@@ -26,6 +26,12 @@ module.exports.AuthorizationError = class  extends HttpError {
     }
 }
 
+module.exports.ForbiddenError = class  extends HttpError {
+    constructor(message = "You have been denied access of the resource you are looking for") {
+        super(403, 'ForbiddenError', message);
+    }
+}
+
 module.exports.NotFoundError = class extends HttpError {
     constructor(message = 'The resource you are looking for does not exist') {
         super(404, 'NotFoundError', message);

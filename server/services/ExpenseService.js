@@ -127,21 +127,11 @@ module.exports = {
   async addExpense (req) {
     try {
       const expenseForm = await getExpenseForm(req);
-      await validateExpenseForm(expenseForm);
+      // await validateExpenseForm(expenseForm);
       const createdExpense = await saveExpense(expenseForm);
       return createdExpense;
     } catch (err) {
       return err;
-    }
-  },
-
-  async getCategories() {
-    try{
-      const categories = await Expense.findAll({attributes: ['category']});
-      return _.uniq(categories).map(el=>el.category);
-    } catch (err) {
-      console.error(`Error in processing getCategories service`, err);
-      return createError(500, "Error fetching categories");
     }
   },
 
