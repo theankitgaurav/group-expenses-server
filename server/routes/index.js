@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const debug = require('debug')('router');
 const AuthController = require('../controllers/AuthController');
+const isAuth = AuthController.isAuthenticated;
 const GroupController = require('../controllers/GroupController');
 const ExpenseController = require('../controllers/ExpenseController');
 
@@ -19,16 +20,18 @@ router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 router.delete("/logout", AuthController.logout);
 
-router.get("/group", AuthController.isAuthenticated, GroupController.getGroups);
-router.get("/group/:groupId", AuthController.isAuthenticated, GroupController.getGroupById);
-router.post("/group/", AuthController.isAuthenticated, GroupController.createGroup);
-router.delete("/group/:groupId", AuthController.isAuthenticated, GroupController.deleteGroupById);
-router.get("/group/:groupId/expense", AuthController.isAuthenticated, ExpenseController.getExpensesByGroupId);
+// Secure Apis
+router.get("/group", isAuth, GroupController.getGroups);
+router.get("/group/:groupId", isAuth, GroupController.getGroupById);
+router.post("/group", isAuth, GroupController.createGroup);
+router.delete("/group/:groupId", isAuth, GroupController.deleteGroupById);
+router.get("/group/:groupId/expense", isAuth, ExpenseController.getExpensesByGroupId);
+router.get("/group/:groupId/category", isAuth, GroupController.getExpenseCategoriesOfGroup);
 
-router.get("/expense", AuthController.isAuthenticated, ExpenseController.getExpensesForUser);
-router.get("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.getExpenseById);
-router.post("/expense", AuthController.isAuthenticated, ExpenseController.createExpense);
-router.delete("/expense/:expenseId", AuthController.isAuthenticated, ExpenseController.deleteExpenseById);
-router.get("/expense/category", ExpenseController.getCategories);
+router.get("/expense", isAuth, ExpenseController.getExpensesForUser);
+router.get("/expense/:expenseId", isAuth, ExpenseController.getExpenseById);
+router.post("/expense", isAuth, ExpenseController.createExpense);
+router.delete("/expense/:expenseId", isAuth, ExpenseController.deleteExpenseById);
+
 
 module.exports = router;
