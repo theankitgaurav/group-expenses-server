@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
-    isPrivate: {type: DataTypes.BOOLEAN, defaultValue: true},
     status: {type: DataTypes.STRING, defaultValue: "active"}
   }, {});
   Group.associate = function(models) {
