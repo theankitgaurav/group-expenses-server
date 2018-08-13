@@ -54,13 +54,16 @@ module.exports = {
           .then((group)=>{
             console.log('Deafult group created with id: ' + group.id);
             user.addGroup(group).then(res=>console.log('User-vs-Group relation added to map.'));
-            return user.id;
+            return user;
           });
         });
       
-      }).then(function (result) { 
+      }).then(function (user) { 
         console.log('Transaction has been committed for user registration flow.');
-        resolve(result);
+        utils.jwtSign(user.id)
+        .then((token)=> {
+          resolve({user, token});
+        });        
       }).catch(function (err) {
         console.log("Transaction has been rolled back for user registration flow.", err);
         reject(new errors.InternalServerError("User could not be saved into db", err));

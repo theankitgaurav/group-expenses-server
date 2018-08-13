@@ -205,6 +205,7 @@ function adaptExpenseModel(expenseModel) {
   const expense = {};
   expense.id = expenseModel.id;
   expense.category = expenseModel.category;
+  expense.details = expenseModel.details;
   expense.amount = expenseModel.amount;
   expense.group = expenseModel.Group.id;
   expense.paidBy = expenseModel.paidBy;

@@ -10,7 +10,7 @@ module.exports = {
             const result = await UserService.registerUser({name, email, password});
             return res.status(200).json({
                 "message": "User registration success.",
-                "data": { userId: result }
+                "data": result
             });
         } catch (err) {
             return next(err);
