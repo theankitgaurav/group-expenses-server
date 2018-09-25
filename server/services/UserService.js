@@ -28,25 +28,7 @@ function validateUserLoginData(userObj) {
   }
 }
 
-/**
- * Helper function to return stripped down version of User object
- * so as to only send the attributes the client may need and hide
- * any sensitive info
- *
- * @param {*} userObj
- * @returns
- */
-function getUserDto (userObj) {
-  if (userObj instanceof User) {
-    const userDto = {};
-    userDto.id = userObj.id;
-    userDto.name = userObj.name;
-    userDto.email = userObj.email;
-    return userDto;
-  } else {
-    console.log(userObj + ' not instance of User model');
-  }
-}
+
 
 
 module.exports = {
@@ -74,8 +56,7 @@ module.exports = {
           .then((group)=>{
             console.log('Deafult group created with id: ' + group.id);
             user.addGroup(group).then(res=>console.log('User-vs-Group relation added to map.'));
-            const userDto = getUserDto(user)
-            return userDto;
+            return user;
           });
         });
       
@@ -104,7 +85,6 @@ module.exports = {
     if(!isPasswordValid) throw new errors.AuthorizationError("Invalid Password");
 
     const token = await utils.jwtSign(userInDb.id);
-    const userDto = getUserDto(userInDb)
-    return {user: userDto, token: token};
+    return {user: userInDb, token: token};
   }
 };
