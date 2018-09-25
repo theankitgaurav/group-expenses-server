@@ -44,6 +44,13 @@ module.exports = {
             });
         });
     },
+    async getGroupMembers (groupId) {
+        const group = await Group.findOne({where: {id: groupId}});
+        if (!group) throw new Error(createError(404, `Group doesn't exist with id: ${groupId}`));
+        const members = await group.getUsers({where: {status: "active"}});
+        console.log('Members: ', members);
+        return members;
+    },
     async isOwner (groupId, userId) {
         Group.findOne({where: {id: groupId}})
         .then((group)=>{

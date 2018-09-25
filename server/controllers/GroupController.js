@@ -23,6 +23,18 @@ module.exports = {
           return next(err);
       }
     },
+    async getGroupMembers (req, res, next) {
+        try {
+            const groupId = req.params.groupId;
+            const members = await GroupService.getGroupMembers(groupId);
+            return res.status(200).json({
+                "message": `${members.length} members fetched`,
+                "data": members.map(member => utils.mapUser(member))
+            });
+        } catch (err) {
+            return next(err);
+        }
+    },
     async isAuthorized (req, res, next) {
         const groupId = req.params.groupId;
         const user = req.user;
