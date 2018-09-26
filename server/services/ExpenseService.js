@@ -166,7 +166,7 @@ module.exports = {
     // Disallow deletion of expenses entered one day before now
     if (enteredBeforeOneDay(expenseInDb)) throw new errors.AuthorizationError("Expenses entered before one day can not be deleted");
 
-    expenseInDb.update({ status: 'CANCEL' })
+    expenseInDb.update({ status: 'cancel' })
     .then(()=>{
       return true;
     })
@@ -189,10 +189,12 @@ module.exports = {
       const userGroupIdsArr = userGroups.map(el=>el.id) 
       const expensesForUser = await Expense.findAll({
         where: {status: 'NORMAL', group: {[Op.in]: userGroupIdsArr}},
-        include: [{
-          model: Group,
-          attributes: ["name", "id"]
-        }]
+        include: [
+          {
+            model: Group,
+            attributes: ["name", "id"]
+          }
+        ]
       });
       return expensesForUser.map(adaptExpenseModel);
     } catch(err) {
