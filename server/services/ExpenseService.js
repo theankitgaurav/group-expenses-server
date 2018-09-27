@@ -166,7 +166,7 @@ module.exports = {
     // Disallow deletion of expenses entered one day before now
     if (enteredBeforeOneDay(expenseInDb)) throw new errors.AuthorizationError("Expenses entered before one day can not be deleted");
 
-    expenseInDb.update({ status: 'cancel' })
+    expenseInDb.update({ status: 'CANCEL' })
     .then(()=>{
       return true;
     })
@@ -182,11 +182,11 @@ module.exports = {
    *
    * @param {User} user User model
    * @returns
-   */
+   */ 
   async getExpensesForUser(user) {
     try{
       const userGroups = await user.getGroups();
-      const userGroupIdsArr = userGroups.map(el=>el.id) 
+      const userGroupIdsArr = userGroups.map(el=>el.id);
       const expensesForUser = await Expense.findAll({
         where: {status: 'NORMAL', group: {[Op.in]: userGroupIdsArr}},
         include: [
@@ -196,23 +196,55 @@ module.exports = {
           }
         ]
       });
-      return expensesForUser.map(adaptExpenseModel);
+      return await adaptExpenseModel(expensesForUser);
     } catch(err) {
+      console.log(err)
       throw new Error("CAN'T FETCH EXPENSES FOR USER", err);
     }
   }
 }
 
-function adaptExpenseModel(expenseModel) {
-  const expense = {};
-  expense.id = expenseModel.id;
-  expense.category = expenseModel.category;
-  expense.details = expenseModel.details;
-  expense.amount = expenseModel.amount;
-  expense.group = expenseModel.Group.id;
-  expense.paidBy = expenseModel.paidBy;
-  expense.enteredBy = expenseModel.enteredBy;
-  expense.paidOn = expenseModel.paidOn;
-  expense.groupName = expenseModel.Group.name;
-  return expense;
+async function adaptExpenseModel(expensesForUser) {
+  const expensesList = [];
+
+  const userIdsArr = [];
+  expensesForUser.forEach(expense => {
+    userIdsArr.push(expense.paidBy);
+    userIdsArr.push(expense.enteredBy);
+  });
+
+  const mapOfIdsVsNames = await getIdVsUserNameMap(userIdsArr);
+
+  for (expense of expensesForUser) {
+    const expenseDto = {};
+    expenseDto.id = expense.id;
+    expenseDto.category = expense.category;
+    expenseDto.details = expense.details;
+    expenseDto.amount = expense.amount;
+    expenseDto.group = expense.Group.id;
+    expenseDto.paidBy = mapOfIdsVsNames.get(expense.paidBy);
+    expenseDto.enteredBy = mapOfIdsVsNames.get(expense.enteredBy);
+    expenseDto.paidOn = expense.paidOn;
+    expenseDto.groupName = expense.Group.name;
+    expensesList.push(expenseDto);
+  }
+  return expensesList;
+}
+
+/**
+ * Helper to fetch a Map of userIds and corresponding 
+ * user's names
+ * @param {Array} userIdsArr
+ * @returns {Map} userId -> name
+ */
+async function getIdVsUserNameMap (userIdsArr) {
+  const distinctUserIdsArr = [...new Set(userIdsArr)];
+  const allUsersForTheExpenses = await UserService.getUsers(distinctUserIdsArr);
+  const mapOfIdsVsNames = new Map();
+  for (user of allUsersForTheExpenses) {
+    if (!mapOfIdsVsNames.has(user.id)) {
+      mapOfIdsVsNames.set(user.id, user.name);
+    }
+  }
+  return mapOfIdsVsNames;
 }

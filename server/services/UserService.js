@@ -40,6 +40,14 @@ module.exports = {
       throw err;
     }
   },
+  getUsers: async (userIdsArr) => {
+    try {
+      return await User.findAll({where: {id: userIdsArr}});
+    } catch (err) {
+      console.error("Error fetching users: ", err);
+      throw err;
+    }
+  },
   registerUser: async (userObj)=>{
     if (!isRegisterDataValid(userObj)) {
       throw new errors.BadRequestError("Incorrect form data for user registration.");
