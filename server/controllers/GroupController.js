@@ -3,9 +3,6 @@ const utils = require('../utils/utils');
 const GroupService = require('../services/GroupService');
 const errors = require('../utils/errors');
 
-// TODO: Use express-validator for validating and sanitizing user input
-// TODO: Avoid sending Request object to the service layer.
-
 module.exports = {
     async getExpenseCategoriesOfGroup(req, res, next) {
       try {
@@ -34,33 +31,6 @@ module.exports = {
         } catch (err) {
             return next(err);
         }
-    },
-    async isAuthorized (req, res, next) {
-        const groupId = req.params.groupId;
-        const user = req.user;
-
-        GroupService.isUserMemberOfGroup(user, groupId)
-        .then(isUserMemberOfGroup=>{
-            if(!isUserMemberOfGroup) {
-                return next(createError(403, 'User not member of group specified'))
-            }
-            return next();
-        })
-        .catch(err=>{
-            return next(err);
-        });
-    },
-    async isModifiable (req, res, next) {
-        const userId = req.user.id;
-        const groupId = req.params.groupId;
-        
-        GroupService.isOwner(groupId, userId)
-        .then ((result)=>{
-            return next();
-        })
-        .catch((err)=>{
-            return next(err);
-        })
     },
     async getGroups (req, res, next) {
         const userId = req.userId;

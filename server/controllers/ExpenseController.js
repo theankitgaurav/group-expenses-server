@@ -5,13 +5,6 @@ const ExpenseService = require('../services/ExpenseService');
 const errors = require('../utils/errors');
 
 module.exports = {
-  /**
-   *
-   *
-   * @param {*} req ExpenseId as parameter
-   * @param {*} res success message or http error with code and message
-   * @param {*} next
-   */
   async deleteExpenseById (req, res, next) {
     try {
       const expenseId = req.params.expenseId;

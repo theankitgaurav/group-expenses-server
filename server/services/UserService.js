@@ -28,9 +28,6 @@ function validateUserLoginData(userObj) {
   }
 }
 
-
-
-
 module.exports = {
   getUser: async (userId)=>{
     try {

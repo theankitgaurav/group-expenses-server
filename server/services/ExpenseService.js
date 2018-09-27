@@ -1,4 +1,3 @@
-const createError = require('http-errors');
 const errors = require('../utils/errors');
 const utils = require('../utils/utils');
 const _ = require('lodash');
@@ -10,8 +9,6 @@ const Expense = require('../db/models').Expense;
 const GroupService = require('./GroupService');
 const UserService = require('./UserService');
 const Op = db.Sequelize.Op;
-const Sequelize = require('sequelize');
-
 async function getExpenseForm (requestObject) {
   try {
     const expenseForm = {};
@@ -127,7 +124,6 @@ module.exports = {
   async addExpense (req) {
     try {
       const expenseForm = await getExpenseForm(req);
-      // await validateExpenseForm(expenseForm);
       const createdExpense = await saveExpense(expenseForm);
       return createdExpense;
     } catch (err) {
