@@ -73,5 +73,20 @@ module.exports = {
     const end = moment(endDate);
     const duration = inDays? now.diff(end, 'days') : now.diff(end);
     return duration;
+  },
+  /**
+   * Helper function to return stripped down version of User object
+   * so as to only send the attributes the client may need and hide
+   * any sensitive info
+   *
+   * @param {*} userObj
+   * @returns
+   */
+  mapUser: function (userObj) {
+    const userDto = {};
+    userDto.id = userObj.id;
+    userDto.name = userObj.name;
+    userDto.email = userObj.email;
+    return userDto;
   }
 }

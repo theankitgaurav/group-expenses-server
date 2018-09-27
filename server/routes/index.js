@@ -27,6 +27,7 @@ router.post("/group", isAuth, GroupController.createGroup);
 router.delete("/group/:groupId", isAuth, GroupController.deleteGroupById);
 router.get("/group/:groupId/expense", isAuth, ExpenseController.getExpensesByGroupId);
 router.get("/group/:groupId/category", isAuth, GroupController.getExpenseCategoriesOfGroup);
+router.get("/group/:groupId/member", isAuth, GroupController.getGroupMembers);
 
 router.get("/expense", isAuth, ExpenseController.getExpensesForUser);
 router.get("/expense/:expenseId", isAuth, ExpenseController.getExpenseById);

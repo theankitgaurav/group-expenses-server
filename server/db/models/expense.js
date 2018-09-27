@@ -29,7 +29,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
 
   Expense.associate = function(models) {
-    Expense.belongsTo(models.Group, {foreignKey: 'group', targetKey: 'id'});
+    Expense.belongsTo(models.Group, {
+      foreignKey: 'group', targetKey: 'id'
+    });
   };
   
   return Expense;
