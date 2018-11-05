@@ -34,9 +34,7 @@ module.exports = {
     try {
       const token = await jwt.sign({
         id: payload
-      }, process.env.JWT_SECRET, {
-        expiresIn: JWT_EXPIRY_DURATION
-      });
+      }, process.env.JWT_SECRET);
       return token;
     } catch (err) {
       throw new Error(`Error during token generation.`, err);
